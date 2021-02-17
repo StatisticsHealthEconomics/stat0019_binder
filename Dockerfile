@@ -1,7 +1,7 @@
 # See https://mybinder.readthedocs.io/en/latest/tutorials/dockerfile.html#preparing-your-dockerfile
 
 # Must specigy a tag
-FROM giabaio/stat0019:7a73683225e5
+FROM giabaio/stat0019:7a73683225e5892584c14c097860c79939f80a468bab25098c11ceccffee6c0f
 
 # Install recent version of Jupyter Notebook
 RUN pip install --no-cache-dir notebook==5.*
