@@ -12,6 +12,7 @@ ARG NB_USER=rstudio
 ARG NB_UID
 ENV USER ${NB_USER}
 ENV HOME /home/${NB_USER}
+RUN echo $NB_USER
 
 # Copy repo into ${HOME}, make user own $HOME
 USER root
