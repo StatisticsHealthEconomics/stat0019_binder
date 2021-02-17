@@ -15,8 +15,8 @@ RUN R -e "options(repos = \
 # Creates user
 ARG NB_USER=stat0019
 ARG NB_UID=1000
-ENV USER ${NB_USER}
-ENV NB_UID ${NB_UID}
+#ENV USER ${NB_USER}
+#ENV NB_UID ${NB_UID}
 ENV HOME /home/${NB_USER}
 
 RUN adduser --disabled-password \
