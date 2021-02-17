@@ -10,8 +10,8 @@ RUN pip install --no-cache --upgrade pip && \
 # create user with a home directory
 ARG NB_USER
 ARG NB_UID
-ENV USER ${NB_USER}
-ENV HOME /home/${NB_USER}
+ENV USER rstudio
+ENV HOME /home/rstudio
 
 RUN echo $HOME
 RUN echo $NB_USER
