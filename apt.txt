@@ -3,3 +3,4 @@ autotools-dev m4
 autoconf
 automake
 g++-multilib
+gcc-multilib g++-multilib
