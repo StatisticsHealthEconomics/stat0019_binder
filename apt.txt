@@ -1,8 +1,2 @@
 jags
-autotools-dev 
-autoconf
-automake
-aclocal
-g++-multilib
 gcc-multilib g++-multilib
-perl
