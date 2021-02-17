@@ -1,3 +1,5 @@
 jags
+autotools-dev m4
+autoconf
+automake
 g++-multilib
-
