@@ -4,3 +4,4 @@ autoconf
 automake
 g++-multilib
 gcc-multilib g++-multilib
+perl
