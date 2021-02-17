@@ -1,4 +1,4 @@
-FROM haoencui/baker
+FROM giabaio/stat0019
 
 RUN mkdir /home/ica
 
