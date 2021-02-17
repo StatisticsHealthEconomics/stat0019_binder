@@ -1,0 +1,6 @@
+#wget https://www.mrc-bsu.cam.ac.uk/wp-content/uploads/2018/04/OpenBUGS-3.2.3.tar.gz
+#tar zxvf OpenBUGS-3.2.3.tar.gz
+#cd OpenBUGS-3.2.3
+#./configure --prefix=/home/jovyan/usr
+#make 
+#make install 
