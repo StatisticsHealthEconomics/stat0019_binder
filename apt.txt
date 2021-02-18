@@ -1,2 +1,0 @@
-jags
-gcc-multilib g++-multilib
