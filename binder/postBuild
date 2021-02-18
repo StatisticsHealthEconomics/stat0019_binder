@@ -45,4 +45,4 @@ make
 # https://github.com/fomightez/jupyter_hide_code/blob/c243a6b0ee51b52e8beda0ea8d27709c315d38cc/postBuild#L53
 mkdir -p  $HOME/.local/bin
 ln -s /home/jovyan/openbugs/src/OpenBUGSCli ~/.local/bin/OpenBUGSCli
-ln -s /home/jovyan/openbugs/src/OpenBUGS ~/.local/bin/OpenBUGS
+ln -s /home/jovyan/openbugs/src/OpenBUGSCli ~/.local/bin/OpenBUGS
