@@ -1,6 +1,48 @@
-wget https://www.mrc-bsu.cam.ac.uk/wp-content/uploads/2018/04/OpenBUGS-3.2.3.tar.gz
-tar zxvf OpenBUGS-3.2.3.tar.gz
-cd OpenBUGS-3.2.3
-./configure --prefix=/home/jovyan/usr
-make 
-make install 
+#!/bin/bash
+
+# Install OpenBUGS
+# Attempt 1 - FAILED with noe about super user authority
+# This approach doesn't work because dpkg requires superuser authority, it seems. See https://github.com/jupyterhub/repo2docker/issues/192
+#OpenBUGS install based on https://github.com/mavelli/rocker-bayesian/blob/28cc0a8635ce360161e882a8c8a92c278f2b3ffc/Dockerfile
+#wget -nd -P /tmp http://pj.freefaculty.org/Debian/squeeze/amd64/openbugs_3.2.2-1_amd64.deb
+#dpkg -i /tmp/openbugs_3.2.2-1_amd64.deb && rm /tmp/openbugs_3.2.2-1_amd64.deb 
+# Attempt 2 - FAILED originally BEFORE I UPDATED `apt.txt` FULLY with note '/usr/include/stdio.h:27:10: fatal error: bits/libc-header-start.h: No such file or directory ... 
+# ... Makefile:233: recipe for target 'all-recursive' failed'
+# based on https://github.com/gshamov/R2jags-image/blob/1f0b9c35a00634f6801c99e3c9dacc04aeb84fa7/Singularity
+# Note that even though current Ubuntu version on Binder is 18.04 (check via `cat /etc/issue`), when I changed 15.04 to 18.04, I got dead link 
+# and looking at https://pj.freefaculty.org/Ubuntu/ shows that addres is last one
+#wget http://pj.freefaculty.org/Ubuntu/15.04/amd64/openbugs/openbugs_3.2.3.orig.tar.gz
+#tar xzf openbugs_3.2.3.orig.tar.gz
+#cd openbugs-3.2.3
+#./configure
+#make && make check && make install
+# SO THAT MAY WORK ?!??! IF Attempt 2 ABOVE TESTED AGAIN AFTER `apt.txt` fixed
+
+
+# Attempt 3
+# based on https://github.com/jsta/openbugs and I added items listed at https://github.com/gshamov/R2jags-image/blob/1f0b9c35a00634f6801c99e3c9dacc04aeb84fa7/Singularity to apt.txt based on http://www.openbugs.net/w/Downloads and 
+# that it maughe be consistent with error above of `'/usr/include/stdio.h:27:10: fatal error: bits/libc-header-start.h: No such file or directory`
+git clone https://github.com/jsta/openbugs.git
+cd openbugs
+./configure
+make
+# I removed `&& make install` from after `make && make check` on above line because it caused following errors:
+# -----ERROR RECORD BELOW---------------
+# Making install in src
+# make[1]: Entering directory '/home/jovyan/openbugs/src'
+#mkdir -p /usr/local/bin /usr/local/lib /usr/local/share/doc/openbugs-`echo "modelQuit()" | ./OpenBUGSCli |sed -ne "s/OpenBUGS version \(.*\) rev \(.*\)/\1/p"` /usr/local/share/man/man1
+#mkdir: cannot create directory ‘/usr/local/share/doc’: Permission denied
+#mkdir: cannot create directory ‘/usr/local/share/man/man1’: Permission denied
+#make[1]: *** [install] Error 1
+# -----END OF ERROR RECORD--------------
+# Also don't really need `make check` each time since I saw it work once. Note that the 'check' runs
+# `./OpenBUGSCli < ../doc/testscript.txt` in '/home/jovyan/openbugs/src'
+# So I removed that, too
+
+# Allow `OpenBUGS` to work without need for absolute path
+# see about use of `~/.local/bin` in https://github.com/fomightez/gohugo-binder/blob/286ea265abd2c5b1d6633b679c6bb1ac88f52c5c/postBuild
+# and another food example of the symbolic link is at 
+# https://github.com/fomightez/jupyter_hide_code/blob/c243a6b0ee51b52e8beda0ea8d27709c315d38cc/postBuild#L53
+mkdir -p  $HOME/.local/bin
+ln -s /home/jovyan/openbugs/src/OpenBUGSCli ~/.local/bin/OpenBUGSCli
+ln -s /home/jovyan/openbugs/src/OpenBUGS ~/.local/bin/OpenBUGS
