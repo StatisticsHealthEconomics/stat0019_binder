@@ -1,0 +1,33 @@
+model{
+
+# Fit Normal model to observed costs from arms 1 and 2
+for(i in 1:N1){
+   cost1[i] ~ dnorm(mu[1], tau[1])
+ }
+
+for(i in 1:N2){
+   cost2[i] ~ dnorm(mu[2], tau[2])
+ }
+
+# Transform precision to variance and standard deviation 
+for(i in 1:2){
+    tau[i] <- 1/ss[i]
+    ss[i] <- s[i]*s[i]
+    log(s[i]) <- ls[i]
+}
+
+delta.c <- mu[2] - mu[1]
+
+#Priors
+for(i in 1:2){
+    mu[i] ~ dunif(0, 1.0E6)
+    ls[i] ~ dunif(-5, 5)
+}
+
+#Deviance
+for(i in 1:N1){d1[i] <- log(exp(-pow(cost1[i]-mu[1],2)/(2*ss[1]))/(sqrt(2*3.1415927*ss[1])))}
+for(i in 1:N2){d2[i] <- log(exp(-pow(cost2[i]-mu[2],2)/(2*ss[2]))/(sqrt(2*3.1415927*ss[2])))}
+dev[1] <- -2*sum(d1[])
+dev[2] <- -2*sum(d2[])
+total.dev <- sum(dev[])
+}
