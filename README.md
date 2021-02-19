@@ -1,4 +1,4 @@
-# STAT0019 Rstudio environment
+# STAT0019 Rstudio environment (light version)
 
 This repository contains the set up to create a Rstudio environment with all the relevant packages and programmes installed.
 
