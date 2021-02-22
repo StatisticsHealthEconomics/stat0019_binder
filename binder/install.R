@@ -1,4 +1,3 @@
-install.packages("survHE")
 install.packages("tidyverse")
 install.packages("rmarkdown")
 install.packages('BCEA')
@@ -7,5 +6,5 @@ install.packages("R2OpenBUGS")
 install.packages("R2jags")
 install.packages("rstan")
 install.packages("INLA",repos=c(getOption("repos"),INLA="https://inla.r-inla-download.org/R/stable"), dep=TRUE)
-
+remotes::install_github("giabaio/survHE",ref="devel")
 
