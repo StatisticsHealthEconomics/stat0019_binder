@@ -1,5 +1,5 @@
 FROM rocker/verse:latest
-MAINTAINER Damir Perisa
+MAINTAINER Damir Perisa 
 
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
