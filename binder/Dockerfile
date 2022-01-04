@@ -1,5 +1,5 @@
 FROM rocker/verse:latest
-MAINTAINER Damir Perisa
+MAINTAINER Damir Perisa 
 
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
@@ -33,3 +33,17 @@ RUN install2.r --error \
 #RUN install2.r --error \
 #  --repos "https://inla.r-inla-download.org/R/stable" \
 #  INLA 
+
+# Now runs the server
+# create user with a home directory
+ARG NB_USER
+ARG NB_UID
+ENV USER ${NB_USER}
+ENV HOME /home/${NB_USER}
+
+RUN adduser --disabled-password \
+    --gecos "Default user" \
+    --uid ${NB_UID} \
+    ${NB_USER}
+WORKDIR ${HOME}
+USER ${USER}
