@@ -14,7 +14,7 @@ RUN echo "Checking for 'apt.txt'..." \
         && xargs -a apt.txt apt-get install --yes \
         && apt-get clean > /dev/null \
         && rm -rf /var/lib/apt/lists/* \
-        && dpkg  -i openbugs_3.2.2-1_amd64.deb && rm openbugs_3.2.2-1_amd64.deb
+        && dpkg  -i openbugs_3.2.2-1_amd64.deb && rm openbugs_3.2.2-1_amd64.deb \
         ; fi
 USER ${NB_USER}
 
