@@ -33,7 +33,7 @@ RUN echo wget -nd -P /tmp http://pj.freefaculty.org/Debian/squeeze/amd64/openbug
 #        && xargs -a apt.txt apt-get install --yes \
 #        && apt-get clean > /dev/null \
 #        && rm -rf /var/lib/apt/lists/* \
-        ; fi
+#        ; fi
 USER ${NB_USER}
 
 RUN R --quiet -f install.R
