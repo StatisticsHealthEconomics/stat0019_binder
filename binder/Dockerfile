@@ -8,8 +8,7 @@ COPY --chown=${NB_USER} . ${HOME}
 
 ENV DEBIAN_FRONTEND=noninteractive
 USER root
-RUN echo wget -nd -P /tmp http://pj.freefaculty.org/Debian/squeeze/amd64/openbugs_3.2.2-1_amd64.deb \
-         && apt-get update --fix-missing > /dev/null \
+RUN echo apt-get update --fix-missing > /dev/null \
          && apt-get install --yes \
          default-jdk \
          gfortran \
@@ -28,7 +27,7 @@ RUN echo wget -nd -P /tmp http://pj.freefaculty.org/Debian/squeeze/amd64/openbug
          jags \
          && apt-get clean > /dev/null \ 
          && rm -fr /var/lib/apt/lists/* \
-         && dpkg -i /tmp/openbugs_3.2.2-1_amd64.deb && rm /tmp/openbugs_3.2.2-1_amd64.deb
+         && dpkg -i openbugs_3.2.2-1_amd64.deb && rm openbugs_3.2.2-1_amd64.deb
 
 #RUN echo "Checking for 'apt.txt'..." \
 #        ; if test -f "apt.txt" ; then \
