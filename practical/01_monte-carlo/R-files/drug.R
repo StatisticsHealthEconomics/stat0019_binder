@@ -1,5 +1,21 @@
 # This files essentially does the same analysis as OpenBUGS
 
+# NB: Remember to set the working directory to the one where the files are stored.
+# You can do this by going on the bottom-right panel, selecting the tab "Files"
+# (which is the default/first one), then navigate to "practicals", then
+# "01_monte-carlo" and then "R-files". Then click on the right-most button
+# "More" and select from the slider menu "Set As Working Directory"
+#
+# Alternatively, you can do this in the R terminal by typing the command
+# setwd("PATH-TO-YOUR-FOLDER")
+# The path changes depending on the operating system. In the case of the 
+# Binder Virtual Machine, this would be
+# setwd("~/practical/01_monte-carlo/R-files")
+# or in a more verbose way
+# setwd("/home/rstudio/practical/01_monte-carlo/R-files")
+# (note that '~' is a shortcut for the home folder '/home/rstudio', in this case)
+
+
 # Defines the number of simulations
 nsim = 11000  # NB: BUGS does 1000 burn-in + 10000 simulations!
 

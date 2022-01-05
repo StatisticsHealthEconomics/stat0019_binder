@@ -3,16 +3,16 @@
 # NB: Remember to set the working directory to the one where the files are stored.
 # You can do this by going on the bottom-right panel, selecting the tab "Files"
 # (which is the default/first one), then navigate to "practicals", then
-# "01-monte-carlo" and then "R-files". Then click on the right-most button
+# "02_mcmc" and then "R-files". Then click on the right-most button
 # "More" and select from the slider menu "Set As Working Directory"
 #
 # Alternatively, you can do this in the R terminal by typing the command
 # setwd("PATH-TO-YOUR-FOLDER")
 # The path changes depending on the operating system. In the case of the 
 # Binder Virtual Machine, this would be
-# setwd("~/practical/01_monte-carlo/R-files")
+# setwd("~/practical/02_mcmc/R-files")
 # or in a more verbose way
-# setwd("/home/rstudio/practical/01_monte-carlo/R-files")
+# setwd("/home/rstudio/practical/02_mcmc/R-files")
 # (note that '~' is a shortcut for the home folder '/home/rstudio', in this case)
 
 
