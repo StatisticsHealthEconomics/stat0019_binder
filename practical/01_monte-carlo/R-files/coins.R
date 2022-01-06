@@ -54,3 +54,49 @@ hist(as.numeric(P8))  # note that R defines 'P8' as a "logical" variable
                       # 'as.numeric' function
 hist(y)               # We don't need any transformation for y, because it is
                       # already a numeric variable
+
+
+#### OPTIONAL
+# NB: you can use more modern tools for visualisation and data-wrangling
+# For this, you need the package 'tidyverse', which includes several other 
+# packages. It takes a bit to get used to it, but once you do, it is *very*
+# powerful
+library(tidyverse)
+
+# This creates a histogram of the distribution for y
+# First, you need to turn your vector of simulations (y) into a different
+# type of object (it needs to be either a 'data.frame' or a 'tibble'). You
+# can also use 'piping' ('%>%'), which takes the argument to the left and 
+# applies the function to the right. So 
+# y %>% as_tibble
+# is equivalent to 
+# as_tibble(y)
+# and what it does is to create a 'tibble' (a structured data frame) with the 
+# variable (column) y.
+y %>% as_tibble() %>% 
+  # Then you start creating a 'ggplot' object. 'ggplot2' is a very powerful
+  # package for advanced graphics. It's a lot more structured than the simpler
+  # 'base' graphical engine and the syntax is a lot more complex. BUT: it can
+  # be very, very versatile and powerful, so worth playing a bit with it...
+  # Here, we define the "aesthetic", eg what are the variables involved in the 
+  # plot. In this case, we want to do a histogram, or more precisely a barplot,
+  # and so the only variable involved is 'y'.
+  ggplot(aes(y)) + 
+  # Then you start adding components (layers) to the graph. In this case, we 
+  # specify the "geometry", that is the type of graph we want to make. In this
+  # case, we will do a barplot, so the relevant command is 'geom_bar'
+  geom_bar() + 
+  # We can also specify a set "theme" for how the graph will look like. You 
+  # can check '?ggtheme' to see which ones are available by default
+  theme_bw() + 
+  labs(title="Histogram of the distribution for y")
+
+# Here's another example, with yet more structure to it...
+y %>% as_tibble() %>% mutate(simulation=1:length(y)) %>% 
+  ggplot(aes(simulation,y)) + geom_line() + theme_classic() + 
+  labs(title="Traceplot for y") + 
+  theme(
+    plot.title = element_text(color="red", size=22, face="bold.italic"),
+    axis.title.x = element_text(color="blue", size=14, face="bold"),
+    axis.title.y = element_text(color="#993333", size=14, face="bold")
+  )
