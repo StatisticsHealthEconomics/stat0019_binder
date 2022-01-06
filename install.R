@@ -1,0 +1,6 @@
+install.packages("tidyverse")
+install.packages("rmarkdown")
+install.packages('BCEA')
+install.packages('Rjags')
+install.packages("R2OpenBUGS")
+install.packages("R2jags")
