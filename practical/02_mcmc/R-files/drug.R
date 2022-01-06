@@ -15,6 +15,8 @@
 # setwd("/home/rstudio/practical/02_mcmc/R-files")
 # (note that '~' is a shortcut for the home folder '/home/rstudio', in this case)
 
+# Loads a suit of utility functions used to post-process data/results
+library(bmhe)
 
 # Defines the number of simulations
 nsim = 11000  # NB: BUGS does 1000 burn-in + 10000 simulations!
@@ -61,9 +63,6 @@ y.pred = rbinom(nsim,npats2,post.theta)
 n.crit = 25
 P.crit = y.pred >= n.crit
 
-# Sources the file "utils.R" to use the 'stats' function to compute the summary
-# statistics for the simulations
-source("utils.R")
 # Then computes the summary statistics
 sims=cbind(theta,post.theta,y.pred,P.crit)
 stats(sims)

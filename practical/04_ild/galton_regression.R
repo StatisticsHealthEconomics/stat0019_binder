@@ -39,7 +39,8 @@ ggplot(galton,aes(Father,Height))+
         axis.ticks.length=unit(.2, "cm")
   ) 
 
-# Recreates Fig 6.3 showing the data on the centered covariate (father's age)
+# Recreates Fig 6.3 of https://gianluca.statistica.it/teaching/intro-stats/regression-to-the-mean.html 
+# showing the data on the centered covariate (father's age)
 plot(scale(galton$Father,scale=F),galton$Height,axes=FALSE,xlab="Centred father's height (inches)",ylab="Child's height (inches)",main="",cex=.7,col="grey40")
 axis(1,at=pretty(range(scale(galton$Father,scale=FALSE)))); axis(2,at=pretty(range(galton$Height)))
 m2=lm(galton$Height~scale(galton$Father,scale=FALSE))

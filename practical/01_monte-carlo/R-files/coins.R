@@ -15,6 +15,8 @@
 # setwd("/home/rstudio/practical/01_monte-carlo/R-files")
 # (note that '~' is a shortcut for the home folder '/home/rstudio', in this case)
 
+# Loads a suit of utility functions used to post-process data/results
+library(bmhe)
 
 # Set up
 n = 10 # number of "trials"
@@ -33,11 +35,8 @@ threshold = 7.5 # y is only integers, so if the threshold is 7.5, it means
                 # there are 8 or more heads in a single simulation
 P8 = y > threshold
 
-# Now summarises the results of the simulations using a specific R function
-# which is defined in the utility file 'utils.R'. This is "sourced" (eg loaded
-# up on the R workspace) using the R command 'source' (type '?source' for help)
-source("utils.R")
-
+# Now summarises the results of the simulations using a specific R function 
+# using tools in the package 'bmhe'
 # First creates a matrix by stacking together the two columns (one for P8
 # and the other for y), using the 'cbind' R built-in command (type '?cbind'
 # to open the help window)

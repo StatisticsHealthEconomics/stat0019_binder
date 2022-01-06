@@ -2,6 +2,7 @@
 setwd("INSERT_PATH_HERE")
 
 # Loads the relevant packages
+install.packages("survHE")
 library(survHE)
 
 # Loads & visualises the data

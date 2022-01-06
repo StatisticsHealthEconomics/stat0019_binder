@@ -15,6 +15,8 @@
 # setwd("/home/rstudio/practical/01_monte-carlo/R-files")
 # (note that '~' is a shortcut for the home folder '/home/rstudio', in this case)
 
+# Loads a suit of utility functions used to post-process data/results
+library(bmhe)
 
 # Defines the number of simulations
 nsim = 11000  # NB: BUGS does 1000 burn-in + 10000 simulations!
@@ -47,11 +49,7 @@ plot(y,t="l",xlim=c(10500,11000))  # NB: the R command 'xlim=c(xx,yy)'
                                    # x-axis to be between xx and yy
 plot(P.crit,t="l",xlim=c(10500,11000))
 
-# Now summarises the results of the simulations using a specific R function
-# which is defined in the utility file 'utils.R'. This is "sourced" (eg loaded
-# up on the R workspace) using the R command 'source' (type '?source' for help)
-source("utils.R")
-
+# Now summarises the results of the simulations using a specific R functions
 # First creates a matrix by stacking together the two columns (one for P8
 # and the other for y), using the 'cbind' R built-in command (type '?cbind'
 # to open the help window)
@@ -93,3 +91,4 @@ sims2 = cbind(P.crit,y,theta)
 stats(sims2)
 # And compares with the old results
 stats(sims)
+
