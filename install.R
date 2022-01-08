@@ -1,6 +1,6 @@
 install.packages("rmarkdown")
 install.packages('BCEA')
-install.packages('Rjags')
+install.packages('rjags')
 install.packages("R2OpenBUGS")
 install.packages("R2jags")
 remotes::install_github("giabaio/bmhe_utils")  
