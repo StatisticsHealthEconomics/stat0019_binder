@@ -17,6 +17,8 @@
 
 # Loads a suit of utility functions used to post-process data/results
 library(bmhe)
+# You can get help on the relevant functions by typing the following command
+help(package="bmhe")
 
 # Set up
 n = 10 # number of "trials"
