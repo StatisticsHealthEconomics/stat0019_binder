@@ -71,6 +71,8 @@ tibble(iter=1:nsim,mu=mu,sigma=sigma) %>% ggplot(aes(iter,sigma)) +
   geom_line() + labs(title="Traceplot for sigma")
 
 # Now can add the contour plot of the underlying distribution
+# Needs a specific package to create the bi-dimensional density
+install.packages("mvtnorm")
 theta <- c(mean(mu),mean(sqrt(sigma2)))
 s <- c(var(mu),var(sqrt(sigma2)))
 rho <- cor(mu,sqrt(sigma2))
@@ -81,6 +83,8 @@ all <- expand.grid(mu=x1, sigma=x2)
 Sigma<-matrix(c(s[1], s[1]*s[2]*rho, s[1]*s[2]*rho, s[2]), nrow=2, ncol=2)
 q.samp <- cbind(all, prob = mvtnorm::dmvnorm(all, mean = theta, sigma = Sigma))
 
+# Also uses an add-on to 'ggplot' to space out labels in plots
+install.packages("ggrepel")
 tibble(iter=1:nsim,mu=mu,sigma=sigma) %>% mutate(xend=lag(mu),yend=lag(sigma)) %>% 
   filter(iter<22) %>% ggplot(aes(mu,sigma)) + geom_contour(data=q.samp, aes(x=mu, y=sigma, z=prob)) +
   coord_fixed(xlim = c(0, 5), ylim = c(0,6), ratio = 1) +
