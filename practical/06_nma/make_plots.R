@@ -36,10 +36,10 @@ or <- or[order(or$com,or$act),]
 inits <- list(list(mu=rep(0,24), d=c(NA,0,0,0), sd=1),
              list(mu=rep(-1,24), d=c(NA,1,1,1), sd=2))
 
-res <- bugs(model="smokere_model.txt", data=smoke.list, inits=inits,
+res2 <- bugs(model="smokere_model.txt", data=smoke.list, inits=inits,
            parameters=c("or", "d", "sd", "pq", "L"),
            n.chains=2, n.burnin=1000, n.iter=20000)
-st <- res$summary
+st <- res2$summary
 
 #  Organise results for plotting
 orre <- st[grep("or", rownames(st)),c("2.5%", "50%", "97.5%")]
