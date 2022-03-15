@@ -140,6 +140,27 @@ m_23=fit.models(Surv(time,status)~as.factor(treat),              # model 'formul
                 distr="gom"                                      # selects the Gompertz model
 )
 
+# OR: you can use INLA (which is an approximated Bayesian computation tool) - the survHE/INLA module
+#     is a bit lighter than the HMC one and does install in the Binder VM. You can run the models
+#     using the following code (note the 'method' option).
+m_12=fit.models(Surv(time,status)~as.factor(treat),              # model 'formula': defines the time and censoring indicator and the covariates
+                data=msmdata %>% filter(trans==1),               # subsets the msmdata by filtering transition number 1 (pre-progression->progressed)
+                distr="gom",                                     # selects the Gompertz model
+                method="inla",                                   # instructs R to use INLA/Bayesian modelling
+)
+
+m_13=fit.models(Surv(time,status)~as.factor(treat),              # model 'formula': defines the time and censoring indicator and the covariates
+                data=msmdata %>% filter(trans==2),               # subsets the msmdata by filtering transition number 2 (pre-progression->death)
+                distr="gom",                                     # selects the Gompertz model
+                method="inla",                                   # instructs R to use INLA/Bayesian modelling
+)
+
+m_23=fit.models(Surv(time,status)~as.factor(treat),              # model 'formula': defines the time and censoring indicator and the covariates
+                data=msmdata %>% filter(trans==3),               # subsets the msmdata by filtering transition number 3 (progressed->death)
+                distr="gom",                                     # selects the Gompertz model
+                method="inla",                                   # instructs R to use INLA/Bayesian modelling
+)
+
 
 # You now need to 'source' the script 'survHE_utils.R' to load up a bunch of useful functions to then run the rest of the analysis
 source("survHE_utils.R")
