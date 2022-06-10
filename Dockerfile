@@ -10,6 +10,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 USER root
 RUN echo "Checking for 'apt.txt'..." \
         ; if test -f "apt.txt" ; then \
+        rm -rf /var/lib/apt/lists && mkdir /var/lib/apt/lists && \ 
         apt-get update --fix-missing > /dev/null && \
         xargs -a apt.txt apt-get install --yes && \
         apt-get clean > /dev/null && \
