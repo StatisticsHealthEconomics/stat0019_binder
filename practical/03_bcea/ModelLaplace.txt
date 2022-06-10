@@ -1,5 +1,0 @@
-# Model for Laplace's analysis of birth's data
-model {
-    y ~ dbin(theta,n)
-    theta ~ dunif(0,1)
-}
