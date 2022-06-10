@@ -10,11 +10,11 @@ ENV DEBIAN_FRONTEND=noninteractive
 USER root
 RUN echo "Checking for 'apt.txt'..." \
         ; if test -f "apt.txt" ; then \
-        apt-get update --fix-missing > /dev/null\
-        && xargs -a apt.txt apt-get install --yes \
-        && apt-get clean > /dev/null \
-        && rm -rf /var/lib/apt/lists/* \
-        && dpkg  -i openbugs_3.2.2-1_amd64.deb && rm openbugs_3.2.2-1_amd64.deb \
+        apt-get update --fix-missing > /dev/null && \
+        xargs -a apt.txt apt-get install --yes && \
+        apt-get clean > /dev/null && \
+        rm -rf /var/lib/apt/lists/* && \
+        dpkg  -i openbugs_3.2.2-1_amd64.deb && rm openbugs_3.2.2-1_amd64.deb \
         ; fi
 USER ${NB_USER}
 
