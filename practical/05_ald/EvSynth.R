@@ -1,9 +1,5 @@
 # Influenza example --- source: Cooper et al (2004); Baio (2012)
 
-# Sets up the working directory to the current one
-working.dir <- getwd()
-setwd(working.dir)
-
 # Defines the data
 # Number of interventions (t=0: control; t=1: prophylactic use of Neuramidase Inhibitors (NI) 
 T <- 2 					

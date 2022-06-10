@@ -1,6 +1,3 @@
-# Sets the working directory
-setwd("INSERT_PATH_HERE")
-
 # Loads the relevant packages
 library(survHE)
 

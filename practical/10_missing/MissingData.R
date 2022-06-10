@@ -1,5 +1,4 @@
 # 0. Sets up environment
-setwd(ENTER PATH HERE)
 library(BCEA)
 library(R2OpenBUGS)
 

@@ -1,4 +1,3 @@
-setwd("C:/Users/epnjw/nickyw/ConDuCT-II/VOICourseFlorence/Intro EVPI")
 library(BCEA)
 
 #Read in 150,000 simulated values of M, a, b, e, h
