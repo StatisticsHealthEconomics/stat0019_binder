@@ -1,5 +1,4 @@
-# This code replicates the plots in the lecture slides for lecture 8
-
+# This code replicates the plots in the lecture slides for lecture 6
 library(bmhe)
 
 # Loads data list

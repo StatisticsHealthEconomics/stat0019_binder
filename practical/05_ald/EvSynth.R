@@ -35,9 +35,15 @@ sigma.inf <- 2.34		# sd cost of influenza episode
 tau.inf <- 1/sigma.inf^2	# precision cost of influenza episode
 
 # Informative prior on length of influenza episodes
-## Compute the value of parameters (mulog,sigmalog) for a logNormal distribution 
-## to have mean and sd (m,s) using functions in 'bmhe'
-library(bmhe)
+## Compute the value of parameters (mulog,sigmalog) for a logNormal distribution to have mean and sd (m,s)
+## Copyright Gianluca Baio 2012
+lognPar <- function(m,s) {
+  s2 <- s^2
+  mulog <- log(m) - 0.5 * log(1+s2/m^2)
+  s2log <- log(1+(s2/m^2))
+  sigmalog <- sqrt(s2log)
+  list(mulog = mulog, sigmalog = sigmalog)
+}
 m.l <- 8.2					# original value in the paper: 8.2
 s.l <- sqrt(2)					# original value in the paper: sqrt(2)
 mu.l <- lognPar(m.l,s.l)$mulog			# mean time to recovery (log scale)

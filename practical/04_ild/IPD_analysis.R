@@ -113,4 +113,3 @@ for (i in 1:length(K)) {		# length(K) is the length of the vector K = number of 
 plot(K,CEAC,xlab="Willingness to pay (x£1000)",ylab="Cost-effectiveness acceptability curve",main="",
 	t="l"	# This instructs R to plot using a solid curve (t="type", "l"=line)
 )
-
