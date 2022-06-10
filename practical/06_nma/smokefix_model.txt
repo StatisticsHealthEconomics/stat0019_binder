@@ -1,0 +1,39 @@
+model {
+
+for(s in 1:NS) { # loop over studies
+    for (a in 1:na[s])  { # loop over arms
+        r[s,t[s,a]] ~ dbin(p[s,t[s,a]], n[s,t[s,a]])
+        logit(p[s,t[s,a]]) <- mu[s] + delta[s,t[s,a]]
+    }
+    ## log odds ratio compared to treatment in arm 1 of study s
+    delta[s,t[s,1]] <- 0
+    for (a in 2:na[s])  {
+        delta[s,t[s,a]] <- d[t[s,a]] - d[t[s,1]]
+    }
+}
+for (i in 1:NS){
+    mu[i] ~ dnorm(0,0.0001) # vague prior for baseline log-odds
+}
+d[1] <- 0  # log odds ratio compared to treatment 1 (e.g. placebo)
+for (i in 2:NT) {
+    d[i] ~ dnorm(0, 0.0001)
+}
+
+## odds ratios for all treatment comparisons
+for (c in 1:(NT-1)) {
+  for (k in (c+1):NT)  {
+    or[c,k] <- exp(d[c] - d[k])
+    or[k,c] <- 1/or[c,k]
+  }
+}
+
+## Log odds of quitting successfully under no intervention (from published data)
+alpha ~ dnorm(-2.6, 6.925208) # = SD 0.38
+## Absolute probability of quitting successfully under each intervention
+for (i in 1:NT) {
+    logit(pq[i]) <- alpha + d[i]
+}
+
+## Life years gained by quitting
+L ~ dnorm(15, 0.0625) # SD=4
+}

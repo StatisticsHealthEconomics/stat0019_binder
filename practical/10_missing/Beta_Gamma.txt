@@ -1,0 +1,87 @@
+model{
+
+# Control arm (t=1)
+for (i in 1:N1){
+# Model for the effectiveness variable (QALYs)
+      # NB: In BUGS need to model the Beta distribution in terms of two parameters (a,b)
+      eff1[i] ~ dbeta(a1[i],b1[i])
+      # These are related to mean (phi.e1[i]) and variance (ss.e[1]) of the Beta distribution as follows
+      a1[i] <- phi.e1[i]*((phi.e1[i]*(1-phi.e1[i])/ss.e[1])-1) 
+      b1[i] <- (1-phi.e1[i])*((phi.e1[i]*(1-phi.e1[i])/ss.e[1])-1)
+      # Now models the marginal mean with a linear predictor (on the *logit* scale), depending on baseline utilities
+      logit(phi.e1[i]) <- alpha0[1]+alpha1[1]*(u1[i]-mu.u[1])
+
+# Model for the baseline utility (covariate for the effectiveness regression) --- see below for the priors
+      u1[i] ~ dbeta(a.u[1],b.u[1])
+
+# Model for the cost variable (depending on the centered effectiveness)
+      # NB: In BUGS need to model the Gamma distribution in terms of two parameters (shape, rate)
+      cost1[i] ~ dgamma(shape[i,1],rate[i,1])
+      # These are related to mean (phi.c1[i]) and standard deviation (sd.c[1]) of the Gamma distribution as follows
+      shape[i,1] <- pow(phi.c1[i],2)/pow(sd.c[1],2)
+      rate[i,1] <- phi.c1[i]/pow(sd.c[1],2)
+      log(phi.c1[i]) <- beta0[1]+beta1[1]*(eff1[i]-mu.e[1])
+}
+
+# Intervention arm (t=2)
+for (i in 1:N2){
+# Model for the effectiveness variable (QALYs)
+      # NB: In BUGS need to model the Beta distribution in terms of two parameters (a,b)
+      eff2[i] ~ dbeta(a2[i],b2[i])
+      # These are related to mean (phi.e2[i]) and variance (ss.e[2]) of the Beta distribution as follows
+      a2[i] <- phi.e2[i]*((phi.e2[i]*(1-phi.e2[i])/ss.e[2])-1) 
+      b2[i] <- (1-phi.e2[i])*((phi.e2[i]*(1-phi.e2[i])/ss.e[2])-1)
+      # Now models the marginal mean with a linear predictor (on the *logit* scale), depending on baseline utilities
+      logit(phi.e2[i]) <- alpha0[2]+alpha1[2]*(u2[i]-mu.u[2])
+
+# Model for the baseline utility (covariate for the effectiveness regression) --- see below for the priors
+      u2[i] ~ dbeta(a.u[2],b.u[2])
+
+# Model for the cost variable (depending on the centered effectiveness)
+      # NB: In BUGS need to model the Gamma distribution in terms of two parameters (shape, rate)
+      cost2[i] ~ dgamma(shape[i,2],rate[i,2])
+      # These are related to mean (phi.c2[i]) and standard deviation (sd.c[2]) of the Gamma distribution as follows
+      shape[i,2] <- pow(phi.c2[i],2)/pow(sd.c[2],2)
+      rate[i,2] <- phi.c2[i]/pow(sd.c[2],2)
+      log(phi.c2[i]) <- beta0[2]+beta1[2]*(eff2[i]-mu.e[2])
+}
+
+# Computes the mean effectiveness and costs
+for (t in 1:2) {
+   # Needs to rescale the intercept for the Beta regression using the inverse logit transformation
+   mu.e[t] <- exp(alpha0[t])/(1+exp(alpha0[t]))
+   # And the intercept for the Gamma regression using the inverse log transformation
+   mu.c[t] <- exp(beta0[t])
+   
+   # Priors
+   # Coefficients for the Beta regression
+   alpha0[t] ~ dnorm(0,0.000001)
+   alpha1[t] ~ dnorm(0,0.000001)
+
+   # Coefficients for the Gamma regression
+   beta0[t] ~ dnorm(0,0.000001)
+   beta1[t] ~ dnorm(0,0.000001)
+
+   # Model for the standard deviation of the Beta distribution --- needs to restrict its range!
+   sd.e.limit[t] <- sqrt(mu.e[t]*(1-mu.e[t]))
+   sd.e[t] ~ dunif(0,sd.e.limit[t])
+   ss.e[t] <- sd.e[t]*sd.e[t]
+   
+   # Model for the standard deviation of the Gamma distribution
+   sd.c[t] ~ dt(0,0.16,1)T(0,)
+
+   # Mean and standard deviation (same restriction on the range) for the Beta baseline utility
+   mu.u[t] ~ dunif(0,1)
+   sd.u.limit[t] <- sqrt(mu.u[t]*(1-mu.u[t]))
+   sd.u[t] ~ dunif(0,sd.u.limit[t])
+   ss.u[t] <- sd.u[t]*sd.u[t]
+   # Transform the shape parameters for the Beta distribution of the baseline utility
+   a.u[t] <- mu.u[t]*((mu.u[t]*(1-mu.u[t])/ss.u[t])-1)
+   b.u[t] <- (1-mu.u[t])*((mu.u[t]*(1-mu.u[t])/ss.u[t])-1)
+
+}
+
+# Incremental quantities
+Delta_e <- mu.e[2]-mu.e[1]
+Delta_c <- mu.c[2]-mu.c[1]
+}

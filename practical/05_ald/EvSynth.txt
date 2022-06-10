@@ -1,0 +1,40 @@
+model {  
+# Evidence synthesis on incidence of influenza in 
+# "healthy" adults in placebo group
+	for(h in 1:H) {
+  		x[h] ~ dbin(beta[h], m[h])
+		logit(beta[h]) <- gamma[h]
+		gamma[h] ~ dnorm(mu.gamma,tau.gamma)
+	}
+
+# Evidence synthesis for efffectiveness of NIs
+	for (s in 1:S) { 
+		r0[s] ~ dbin(pi0[s],n0[s])
+		r1[s] ~ dbin(pi1[s],n1[s])
+		logit(pi0[s]) <- alpha[s]
+		logit(pi1[s]) <- alpha[s]+delta[s]
+		delta[s] ~ dnorm(mu.delta,tau.delta)
+		alpha[s] ~ dnorm(mean.alpha,prec.alpha)
+	} 
+
+# Prior distributions
+	mu.delta ~ dnorm(mean.mu.delta,prec.mu.delta)       
+	mu.gamma ~ dnorm(mean.mu.gamma,prec.mu.gamma)
+	sigma.delta ~ dunif(0,10)
+	tau.delta <- pow(sigma.delta,-2)
+	sigma.gamma ~ dunif(0,10)
+	tau.gamma <- pow(sigma.gamma,-2)
+	phi ~ dnorm(0,0.0001)
+
+# Costs of influenza
+	c.inf ~ dnorm(mu.inf,tau.inf)
+# Length of time to recovery when infected by influenza
+	l ~ dlnorm(mu.l,tau.l)
+
+# Odds Ratio of influenza under treatment with NIs
+	rho <- exp(mu.delta)
+# Estimated probability of influenza in "healthy adults" under t=0
+	p1 <- exp(mu.gamma)/(1+exp(mu.gamma))	
+# Estimated probability of influenza in "healthy adults" under t=1
+	p2 <- (rho*p1/(1-p1))/(1+rho*p1/(1-p1))
+} 
