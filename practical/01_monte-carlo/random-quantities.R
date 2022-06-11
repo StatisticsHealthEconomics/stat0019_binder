@@ -15,6 +15,8 @@
 # setwd("/home/rstudio/practical/01_monte-carlo/R-files")
 # (note that '~' is a shortcut for the home folder '/home/rstudio', in this case)
 
+# Utility package
+library(bmhe)
 
 # First we need to simulate values for a variable y ~ Normal(0,1)
 # We can easily do this using the built-in R command 'rnorm'
