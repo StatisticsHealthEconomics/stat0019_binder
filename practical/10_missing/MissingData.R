@@ -24,7 +24,7 @@ n.iter<-10000
 
 # 5. sets up initial values for crucial parameters
 inits=function(){
-   list(alpha0=rnorm(2),alpha1=rnorm(2),beta0=rnorm(2),beta1=rnorm(2),mu.u=rnorm(2))
+   list(alpha0=rnorm(2),alpha1=rnorm(2),beta0=rnorm(2),beta1=rnorm(2),mu.u=runif(2))
 }
 
 # 6. runs the model
