@@ -21,3 +21,6 @@ USER ${NB_USER}
 
 ## Run an install.R script, if it exists.
 RUN if [ -f install.R ]; then R --quiet -f install.R; fi
+
+## Moves to 'practicals' directory
+WORKDIR practical
