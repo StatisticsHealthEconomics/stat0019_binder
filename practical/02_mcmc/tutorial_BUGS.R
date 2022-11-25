@@ -35,7 +35,7 @@ model = bugs(
   inits=NULL,
   # The model file is define externally - using here::here ensures that we 
   # pick the correct full path to the model file
-  model.file=here::here("02_mcmc","drug-MCMC.txt"),
+  model.file=here::here("practical","02_mcmc","drug-MCMC.txt"),
   n.chains=2,
   n.iter=5000,
   n.burnin=0,
