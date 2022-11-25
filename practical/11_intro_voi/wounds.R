@@ -1,4 +1,4 @@
-setwd("C:/Users/epnjw/nickyw/ConDuCT-II/VOICourseFlorence/Intro EVPI")
+setwd(here::here("practical","11_intro_voi"))
 library(BCEA)
 
 #Read in 150,000 simulated values of Qwi, Qnwi, Cwi, Cnwi, Cdrug, phi, psi

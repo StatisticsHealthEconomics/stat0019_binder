@@ -1,5 +1,7 @@
 library(BCEA)
 
+setwd(here::here("practical","11_intro_voi"))
+
 #Read in 150,000 simulated values of M, a, b, e, h
 par<-read.table("hiv150.txt",header=TRUE)
 N<-105000; T<-3; Nsim<-nrow(par); Nt<-2	#Nt=no. trts

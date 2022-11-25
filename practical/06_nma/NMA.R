@@ -3,7 +3,7 @@ library(BCEA)
 
 ### Smoking cessation network meta-analysis data in format obtained
 ### from Lu & Ades tutorial "Introduction to Mixed Treatment Comparisons"
-load("smoke.Rdata")
+load(here::here("practical","06_nma","smoke.Rdata"))
 
 ### Explores the data object just loaded
 names(smoke.list)
@@ -17,9 +17,11 @@ inits <- list(list(mu=rep(0,24), d=c(NA,0,0,0)),
 ### FIXED EFFECTS MODEL
 
 ### Pilot run with no burn-in, to illustrate convergence using traceplots
-res <- bugs(model="smokefix_model.txt", data=smoke.list, inits=inits,
-            parameters=c("d"),
-            n.chains=2, n.burnin=0, n.iter=10000
+res <- bugs(
+  model=here::here("practical","06_nma","smokefix_model.txt"), 
+  data=smoke.list, inits=inits,
+  parameters=c("d"),
+  n.chains=2, n.burnin=0, n.iter=10000
 )
 # Traceplots
 par(mfrow=c(2,2))
@@ -30,12 +32,17 @@ points(res$sims.array[,2,2],t="l",col="red")
 plot(res$sims.array[,1,3],t="l",xlab="Iterations",ylab="d[4]",col="blue")
 points(res$sims.array[,2,3],t="l",col="red")
 
-# In Rstudio do par(mfrow=c(1,1)) to "reset" the graphical interface
+# Can also use 'bmhe::traceplot' to automate this, for instance
+bmhe::traceplot(res,"d")
 
+# In Rstudio do par(mfrow=c(1,1)) to "reset" the graphical interface
 ## It's certainly converged by 1000, so no need for any more fancy diagnostics
-res <- bugs(model="smokefix_model.txt", data=smoke.list, inits=inits,
-            parameters=c("d","L","pq"),
-            n.chains=2, n.burnin=1000, n.iter=5000)
+res <- bugs(
+  model=here::here("practical","06_nma","smokefix_model.txt"), 
+  data=smoke.list, inits=inits,
+  parameters=c("d","L","pq"),
+  n.chains=2, n.burnin=1000, n.iter=5000
+)
 res
 
 ## How many further iterations do we need after convergence?  Consider
@@ -47,9 +54,11 @@ res
 inits <- list(list(mu=rep(0,24), d=c(NA,0,0,0), sd=1),
               list(mu=rep(-1,24), d=c(NA,1,1,1), sd=2))
 
-res2 <- bugs(model="smokere_model.txt", data=smoke.list, inits=inits,
-            parameters=c("or", "d", "sd", "pq", "L"),
-            n.chains=2, n.burnin=1000, n.iter=20000
+res2 <- bugs(
+  model=here::here("practical","06_nma","smokere_model.txt"), 
+  data=smoke.list, inits=inits,
+  parameters=c("or", "d", "sd", "pq", "L"),
+  n.chains=2, n.burnin=1000, n.iter=20000
 )
 print(res2,digits=3)
 
@@ -72,7 +81,10 @@ plot(m)
 
 
 ### Appendix: Original pre-processing of dataset to format the data in a suitable way
-smoke <- read.table("smoke_data_orig.txt", header=TRUE, nrow=24)
+smoke <- read.table(
+  here::here("practical","06_nma","smoke_data_orig.txt"), 
+  header=TRUE, nrow=24
+)
 names(smoke) <- gsub("\\.", "", names(smoke))
 ns <- nrow(smoke)
 nt <- 4

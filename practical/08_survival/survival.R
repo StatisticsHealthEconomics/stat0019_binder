@@ -2,7 +2,7 @@
 library(survHE)
 
 # Loads & visualises the data
-load("survival_data.Rdata")
+load(here::here("practical","08_survival","survival_data.Rdata"))
 head(dat)
 
 # Defines the model formula, including the treatment arm as the only covariate

@@ -10,9 +10,7 @@
 ##########################################################
 
 ####Required Pacakges
-install.packages("devtools")
-library(devtools)
-install_github("annaheath/EVSI")
+remotes::install_github("annaheath/EVSI")
 library(R2OpenBUGS)
 library(BCEA)
 library(EVSI)
@@ -63,7 +61,7 @@ Model<-function(){
 }
 
 #This writes the model we just defined as a text file for use within BUGS 
-filein.model <- "Model_File.txt"
+filein.model <- here::here("practical","14_evsi_mc","Model_File.txt")
 write.model(Model,filein.model)
 
 ####Define the parameters of the multivariate normal priors

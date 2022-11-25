@@ -3,20 +3,23 @@ library(R2OpenBUGS)
 
 ### Exercise 1.
 # Loads the data on costs only into R from the txt file (list originally prepared for BUGS)
-cost.data=source("cost-data.txt")$value
+cost.data=source(here::here("practical","04_ild","cost-data.txt"))$value
 # Can inspect the resulting object
 names(cost.data)
 # NB: 'cost.data' is an object containing different variables so need to use the '$' notation to access them!
 head(cost.data$cost1)		# This for example shows the first 6 values of the variable 'cost1' inside 'cost.data'
 							
 # Runs the BUGS model from R
-model.file="normal-mod.txt"				# Specifies the path to the model file
-params <- c("mu","ss","ls","delta.c","dev","total.dev")	# Defines the list of parameters
-n.chains=2						# How many parallel chains?
+# Specifies the path to the model file - uses 'here::here' to make sure we get the correct file
+model.file=here::here("practical","04_ild","normal-mod.txt")				
+
+# Defines the list of parameters
+params <- c("mu","ss","ls","delta.c","dev","total.dev")	
+n.chains=2						  # How many parallel chains?
 n.burnin=1000						# Number of simulations to discard before convergence
-n.iter=2000						# Total number of simulations
-n.thin=1						# Saves one simulation every n.thin (may need 
-							#   to increase to reduce autocorr)
+n.iter=2000						  # Total number of simulations
+n.thin=1						    # Saves one simulation every n.thin (may need 
+							          #   to increase to reduce autocorr)
 debug=FALSE						# If set to FALSE then does not show OpenBUGS
 
 # Finally runs the model by calling OpenBUGS in the background
@@ -35,15 +38,16 @@ plot(
 	m$sims.list$mu[,2],					# What to plot on the y-axis?
 	xlab="Population average cost in arm 1 (x£1000)",	# Label for the x-axis
 	ylab="Population average cost in arm 2 (x£1000)",	# Label for the y-axis
-	pch=20,							# Type of symbol used in the plot 									# (see http://www.endmemo.com/program/R/pchsymbols.php)
+	pch=20,							# Type of symbol used in the plot 									
+	                    #  (see http://www.endmemo.com/program/R/pchsymbols.php)
 	cex=.8,							# Amount by which plotting text and symbols should be scaled 
-								# relative to the default (here 80%)
+								      #  relative to the default (here 80%)
 	main="Joint distribution of mean costs"			# Title for the plot
 )
 # Rescales the difference in cost by £1000
 delta.c=m$sims.list$delta.c*1000
 hist(
-	delta.c,						# variable to use for the histogram 
+	delta.c,						                # variable to use for the histogram 
 	xlab="Cost differential (£)",				# Label for the x-axis
 	main="Posterior distribution"				# Title of the graph
 )
@@ -60,27 +64,44 @@ sum(delta.c>0)/m$n.sims
 
 ## Exercise 3.
 # Now loads the data for costs & utilities into R from the txt file (list originally prepared for BUGS)
-cost.utility=source("cost-util-data.txt")$value		
-model.file="cgeg-mod.txt"				# Specifies the new file with the cost-effectiveness model
-inits1=source("cgeg-inits1.txt")$value			# Loads the initial values for the 1st chain
-inits2=source("cgeg-inits2.txt")$value			# Loads the initial values for the 2nd chain
-inits3=source("cgeg-inits3.txt")$value			# Loads the initial values for the 3rd chain
-inits=list(inits1,inits2,inits3)			# Combines them into a single list --- can be lazy and only use 2...
-params=c("mu.c","mu.e","delta.c","delta.e",		# Defines the list of parameters to be monitored
-	"shape.c","shape.e","beta","INB","CEAC")
+cost.utility=source(
+  here::here("practical","04_ild","cost-util-data.txt")
+)$value		
+# Specifies the new file with the cost-effectiveness model
+model.file=here::here("practical","04_ild","cgeg-mod.txt")				
+
+# Loads the initial values for the three chains
+inits1=source(here::here("practical","04_ild","cgeg-inits1.txt"))$value
+inits2=source(here::here("practical","04_ild","cgeg-inits2.txt"))$value
+inits3=source(here::here("practical","04_ild","cgeg-inits3.txt"))$value
+
+# Combines them into a single list --- can be lazy and only use 2...
+inits=list(inits1,inits2,inits3)			
+
+# Defines the list of parameters to be monitored
+params=c(
+  "mu.c","mu.e","delta.c","delta.e","shape.c","shape.e","beta","INB","CEAC"
+)
+
 # Finally runs the model by calling OpenBUGS in the background
 n.burnin=1000
 n.iter=4000			# NB: this adds 3000 simulations to the 1000 of burnin
 n.chains=3
-m2=bugs(data=cost.utility,inits=inits,model.file=model.file,parameters.to.save=params,
-	n.chains=n.chains,n.iter=n.iter,n.burnin=n.burnin,n.thin=n.thin,DIC=T,debug=debug)
+m2=bugs(
+  data=cost.utility,inits=inits,model.file=model.file,
+  parameters.to.save=params,n.chains=n.chains,n.iter=n.iter,
+  n.burnin=n.burnin,n.thin=n.thin,DIC=T,debug=debug
+)
 
 # Now can print & manipulate the output (stored in the object 'm')
 print(m2)
 
 # Plots the cost-effectiveness plane
-plot(m2$sims.list$delta.e,m2$sims.list$delta.c,pch=20,cex=.8,xlab="Effectiveness differential",
-	ylab="Cost differential",main="Cost-effectiveness plane")
+plot(
+  m2$sims.list$delta.e,m2$sims.list$delta.c,
+  pch=20,cex=.8,xlab="Effectiveness differential",
+  ylab="Cost differential",main="Cost-effectiveness plane"
+)
 
 ## Exercise 4.
 # Figures out which of the indices is associated with willingness to pay = £500

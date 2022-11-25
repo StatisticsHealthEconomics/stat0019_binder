@@ -5,7 +5,8 @@
 library(dplyr)
 
 # Set the working directory, for example something like 
-## setwd("PATH TO THE FOLDER WHERE THE DATA AND SCRIPTS ARE STORED")
+setwd(here::here("practical","09_mm"))
+
 # Now loads the data. Notice the 'pipe' operator '%>%' (https://cran.r-project.org/web/packages/magrittr/vignettes/magrittr.html) 
 data=read.table("data.txt",header=T,sep="\t") %>% 
   # Structure the data as a "tibble" for easier visualisation and manipulation

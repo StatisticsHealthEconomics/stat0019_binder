@@ -42,7 +42,7 @@ alpha.1 <- rep(scale,S)
 # Run the MCMC model
 library(R2OpenBUGS)
 dataBugs <- list("n.0","n.1","r.0","r.1","alpha.0","alpha.1","S") 
-filein <- "MarkovModel1.txt"
+filein <- here::here("practical","09_mm","MarkovModel1.txt")
 params <- c("lambda.0","lambda.1")
 # lambda.0 and lambda.1 need: 4 random rows (even Hex has random parameters) 
 #	                      1 row of NAs (because TP is deterministic)
@@ -67,7 +67,7 @@ attach.bugs(mm1)
 ## Alternatively, could use JAGS --- code basically identical
 ## library(R2jags)
 ## dataJags <- list("n.0","n.1","r.0","r.1","alpha.0","alpha.1","S") 
-## filein <- "MarkovModel1.txt"
+## filein <- here::here("practical","09_mm","MarkovModel1.txt")
 ## params <- c("lambda.0","lambda.1")
 ## # lambda.0 and lambda.1 need: 4 random rows (even Hex has random parameters) 
 ## #	                      1 row of NAs (because TP is deterministic)
