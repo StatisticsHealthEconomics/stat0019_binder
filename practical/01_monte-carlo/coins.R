@@ -1,26 +1,26 @@
 # This files essentially does the same analysis as OpenBUGS
 
-# NB: Remember to set the working directory to the one where the files are stored.
-# You can do this by going on the bottom-right panel, selecting the tab "Files"
-# (which is the default/first one), then navigate to "practicals", then
-# "01_monte-carlo" and then "R-files". Then click on the right-most button
+# Uses the package 'here' to set the working directory to the correct one
+setwd(here::here("practical","01_monte-carlo"))
+
+# Alternatively, you can do this by going on the bottom-right panel, selecting 
+# the tab "Files" (which is the default/first one), then navigate to "practicals", 
+# then "01_monte-carlo" and then "R-files". Then click on the right-most button
 # "More" and select from the slider menu "Set As Working Directory"
 #
-# Alternatively, you can do this in the R terminal by typing the command
+# Or, you can do this in the R terminal by typing the command
 # setwd("PATH-TO-YOUR-FOLDER")
 # The path changes depending on the operating system. In the case of the 
 # Binder Virtual Machine, this would be
-# setwd("~/practical/01_monte-carlo/R-files")
+# setwd("~/practical/01_monte-carlo/")
 # or in a more verbose way
-# setwd("/home/rstudio/practical/01_monte-carlo/R-files")
+# setwd("/home/rstudio/practical/01_monte-carlo/")
 # (note that '~' is a shortcut for the home folder '/home/rstudio', in this case)
 
-# Loads a suit of utility functions used to post-process data/results
+# Utility package
 library(bmhe)
-# You can get help on the relevant functions by typing the following command
-help(package="bmhe")
 
-# Set up
+# Set up 
 n = 10 # number of "trials"
 theta = 0.5 # probability of "success" (heads) - the coin is "balanced"
 
@@ -37,8 +37,6 @@ threshold = 7.5 # y is only integers, so if the threshold is 7.5, it means
                 # there are 8 or more heads in a single simulation
 P8 = y > threshold
 
-# Now summarises the results of the simulations using a specific R function 
-# using tools in the package 'bmhe'
 # First creates a matrix by stacking together the two columns (one for P8
 # and the other for y), using the 'cbind' R built-in command (type '?cbind'
 # to open the help window)
@@ -55,6 +53,7 @@ hist(as.numeric(P8))  # note that R defines 'P8' as a "logical" variable
                       # 'as.numeric' function
 hist(y)               # We don't need any transformation for y, because it is
                       # already a numeric variable
+
 
 
 #### OPTIONAL

@@ -1,9 +1,5 @@
 # Influenza example --- source: Cooper et al (2004); Baio (2012)
 
-# Sets up the working directory to the current one
-working.dir <- getwd()
-setwd(working.dir)
-
 # Defines the data
 # Number of interventions (t=0: control; t=1: prophylactic use of Neuramidase Inhibitors (NI) 
 T <- 2 					
@@ -35,14 +31,13 @@ sigma.inf <- 2.34		# sd cost of influenza episode
 tau.inf <- 1/sigma.inf^2	# precision cost of influenza episode
 
 # Informative prior on length of influenza episodes
-## Compute the value of parameters (mulog,sigmalog) for a logNormal distribution 
-## to have mean and sd (m,s) using functions in 'bmhe'
-library(bmhe)
-m.l <- 8.2					# original value in the paper: 8.2
-s.l <- sqrt(2)					# original value in the paper: sqrt(2)
-mu.l <- lognPar(m.l,s.l)$mulog			# mean time to recovery (log scale)
-sigma.l <- lognPar(m.l,s.l)$sigmalog		# sd time to recovery (log scale)
-tau.l <- 1/sigma.l^2				# precision time to recovery (log scale)
+# Compute the value of parameters (mulog,sigmalog) for a logNormal 
+# distribution to have mean and sd (m,s) - check help(lognPar)
+m.l <- 8.2			                      		    # original value in the paper: 8.2
+s.l <- sqrt(2)					                      # original value in the paper: sqrt(2)
+mu.l <- bmhe::lognPar(m.l,s.l)$mulog			    # mean time to recovery (log scale)
+sigma.l <- bmhe::lognPar(m.l,s.l)$sigmalog		# sd time to recovery (log scale)
+tau.l <- 1/sigma.l^2				                  # precision time to recovery (log scale)
 
 # Parameters of unstructured effects
 mean.alpha <- 0
@@ -66,7 +61,7 @@ data <- list(S=S,H=H,r0=r0,r1=r1,n0=n0,n1=n1,x=x,m=m,mu.inf=mu.inf,tau.inf=tau.i
              mean.mu.gamma=mean.mu.gamma,prec.mu.gamma=prec.mu.gamma)
 
 # Points to the txt file where the OpenBUGS model is saved
-filein <- "EvSynth.txt"
+filein <- here::here("practical","05_ald","EvSynth.txt")
 
 # Defines the parameters list
 params <- c("p1","p2","rho","l","c.inf","alpha","delta","gamma")

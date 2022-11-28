@@ -1,21 +1,23 @@
 # This files essentially does the same analysis as OpenBUGS
 
-# NB: Remember to set the working directory to the one where the files are stored.
-# You can do this by going on the bottom-right panel, selecting the tab "Files"
-# (which is the default/first one), then navigate to "practicals", then
-# "01_monte-carlo" and then "R-files". Then click on the right-most button
+# Uses the package 'here' to set the working directory to the correct one
+setwd(here::here("practical","01_monte-carlo"))
+
+# Alternatively, you can do this by going on the bottom-right panel, selecting 
+# the tab "Files" (which is the default/first one), then navigate to "practicals", 
+# then "01_monte-carlo" and then "R-files". Then click on the right-most button
 # "More" and select from the slider menu "Set As Working Directory"
 #
-# Alternatively, you can do this in the R terminal by typing the command
+# Or, you can do this in the R terminal by typing the command
 # setwd("PATH-TO-YOUR-FOLDER")
 # The path changes depending on the operating system. In the case of the 
 # Binder Virtual Machine, this would be
-# setwd("~/practical/01_monte-carlo/R-files")
+# setwd("~/practical/01_monte-carlo/")
 # or in a more verbose way
-# setwd("/home/rstudio/practical/01_monte-carlo/R-files")
+# setwd("/home/rstudio/practical/01_monte-carlo/")
 # (note that '~' is a shortcut for the home folder '/home/rstudio', in this case)
 
-# Loads a suit of utility functions used to post-process data/results
+# Utility package
 library(bmhe)
 
 # Defines the number of simulations
@@ -38,7 +40,7 @@ plot(
 npats = 20 # number of patients in the trial
 y = rbinom(nsim,npats,theta)
 # Computes the probability of 15 or more successes in each simulation
-threshold = 14.5 # y is only integers, so if the threshold is 13.5, it means
+threshold = 14.5 # y is only integers, so if the threshold is 14.5, it means
 # there are 15 or more successes in a single simulation
 P.crit = y > threshold
 
@@ -49,7 +51,6 @@ plot(y,t="l",xlim=c(10500,11000))  # NB: the R command 'xlim=c(xx,yy)'
                                    # x-axis to be between xx and yy
 plot(P.crit,t="l",xlim=c(10500,11000))
 
-# Now summarises the results of the simulations using a specific R functions
 # First creates a matrix by stacking together the two columns (one for P8
 # and the other for y), using the 'cbind' R built-in command (type '?cbind'
 # to open the help window)
@@ -91,4 +92,3 @@ sims2 = cbind(P.crit,y,theta)
 stats(sims2)
 # And compares with the old results
 stats(sims)
-

@@ -1,9 +1,8 @@
-# This code replicates the plots in the lecture slides for lecture 8
-
+# This code replicates the plots in the lecture slides for lecture 6
 library(bmhe)
 
 # Loads data list
-load("smoke.Rdata")
+load(here::here("practical","06_nma","smoke.Rdata"))
 # Treatment names
 tnames <- c("A: None","B: Self-help","C: Individual","D: Group")
 
@@ -17,9 +16,12 @@ dc[dc=="NA/NA"] <- ""
 # Initial values
 inits <- list(list(mu=rep(0,24), d=c(NA,0,0,0)),
               list(mu=rep(-1,24), d=c(NA,1,1,1)))
-res <- bugs(model="smokefix_model.txt", data=smoke.list, inits=inits,
-           parameters=c("d","or","L","pq"),
-           n.chains=2, n.burnin=1000, n.iter=20000)
+res <- bugs(
+  model=here::here("practical","06_nma","smokefix_model.txt"), 
+  data=smoke.list, inits=inits,
+  parameters=c("d","or","L","pq"),
+  n.chains=2, n.burnin=1000, n.iter=20000
+)
 st <- res$summary  # Gives posterior median or mean and 95% CIs for odds ratios, for plotting
 
 #  Organise results for plotting
@@ -36,9 +38,12 @@ or <- or[order(or$com,or$act),]
 inits <- list(list(mu=rep(0,24), d=c(NA,0,0,0), sd=1),
              list(mu=rep(-1,24), d=c(NA,1,1,1), sd=2))
 
-res2 <- bugs(model="smokere_model.txt", data=smoke.list, inits=inits,
-           parameters=c("or", "d", "sd", "pq", "L"),
-           n.chains=2, n.burnin=1000, n.iter=20000)
+res2 <- bugs(
+  model=here::here("practical","06_nma","smokere_model.txt"), 
+  data=smoke.list, inits=inits,
+  parameters=c("or", "d", "sd", "pq", "L"),
+  n.chains=2, n.burnin=1000, n.iter=20000
+)
 st <- res2$summary
 
 #  Organise results for plotting

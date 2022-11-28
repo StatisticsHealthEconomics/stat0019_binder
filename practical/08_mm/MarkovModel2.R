@@ -5,7 +5,8 @@
 library(dplyr)
 
 # Set the working directory, for example something like 
-## setwd("PATH TO THE FOLDER WHERE THE DATA AND SCRIPTS ARE STORED")
+setwd(here::here("practical","09_mm"))
+
 # Now loads the data. Notice the 'pipe' operator '%>%' (https://cran.r-project.org/web/packages/magrittr/vignettes/magrittr.html) 
 data=read.table("data.txt",header=T,sep="\t") %>% 
   # Structure the data as a "tibble" for easier visualisation and manipulation
@@ -56,7 +57,7 @@ msmdata=
       to=3,                                                               # arriving state (3="Death")
       trans=2,                                                            # transition ID (2="Pre-progression -> Death")
       Tstart=0,                                                           # entry time
-      Tstop=death_t,                                                      # exit time (time at which the event happens)
+      Tstop=prog_t,                                                       # exit time (time at which the event happens)
       time=Tstop-Tstart,                                                  # observed time
       status=case_when(                                                   # event indicator
         (death==1 & prog_t==death_t)~1,                                   #   if death then 1
@@ -87,25 +88,10 @@ msmdata=
 msmdata
 
 # Now runs the survival analysis for the three subsets. You need 'survHE' to do this. 
-## NB: survHE is a *big* package. If you install the CRAN version or the main Github
-##     version, you can run the code below with no problem. But the installation 
-##     will be a long operation. You can do this typing
-##     install.packages("survHE")  # From CRAN
-##     or
-##     remotes::install_github("giabaio/survHE")  # From Github
-##     (note you need to have 'remotes' installed too).
-##     On the Binder VM, this will crash the system, so we use a "cheat" and 
-##     only install the "frequentist" module, which allows only to use 
-##     'flexsurv' in the background to fit the survival models. We can do this
-##     installing the devel branch of the Github repository, using:
-##     remotes::install_github("giabaio/survHE",ref="devel")
-##     (you don't need to do it if you use the Binder VM - that's already available).
-
 # Loads survHE
 library(survHE)
 
 # Runs survival models on the specific subsets to obtain estimate of the various transition probabilities
-# NB: If you have the "full" version of survHE you can run the following code, as is
 m_12=fit.models(Surv(time,status)~as.factor(treat),              # model 'formula': defines the time and censoring indicator and the covariates
                 data=msmdata %>% filter(trans==1),               # subsets the msmdata by filtering transition number 1 (pre-progression->progressed)
                 distr="gom",                                     # selects the Gompertz model
@@ -122,45 +108,7 @@ m_23=fit.models(Surv(time,status)~as.factor(treat),              # model 'formul
                 data=msmdata %>% filter(trans==3),               # subsets the msmdata by filtering transition number 3 (progressed->death)
                 distr="gom",                                     # selects the Gompertz model
                 method="hmc",                                    # instructs R to use HMC/Bayesian modelling
-                priors=list(gom=list(a_alpha=1.5,b_alpha=1.5)))  # specifies the informative prior
-
-# BUT: if you are using the Binder VM, you need to slightly modify the code above to use the frequentist version
-m_12=fit.models(Surv(time,status)~as.factor(treat),              # model 'formula': defines the time and censoring indicator and the covariates
-                data=msmdata %>% filter(trans==1),               # subsets the msmdata by filtering transition number 1 (pre-progression->progressed)
-                distr="gom"                                      # selects the Gompertz model
-)
-
-m_13=fit.models(Surv(time,status)~as.factor(treat),              # model 'formula': defines the time and censoring indicator and the covariates
-                data=msmdata %>% filter(trans==2),               # subsets the msmdata by filtering transition number 2 (pre-progression->death)
-                distr="gom"                                      # selects the Gompertz model
-)
-
-m_23=fit.models(Surv(time,status)~as.factor(treat),              # model 'formula': defines the time and censoring indicator and the covariates
-                data=msmdata %>% filter(trans==3),               # subsets the msmdata by filtering transition number 3 (progressed->death)
-                distr="gom"                                      # selects the Gompertz model
-)
-
-# OR: you can use INLA (which is an approximated Bayesian computation tool) - the survHE/INLA module
-#     is a bit lighter than the HMC one and does install in the Binder VM. You can run the models
-#     using the following code (note the 'method' option).
-m_12=fit.models(Surv(time,status)~as.factor(treat),              # model 'formula': defines the time and censoring indicator and the covariates
-                data=msmdata %>% filter(trans==1),               # subsets the msmdata by filtering transition number 1 (pre-progression->progressed)
-                distr="gom",                                     # selects the Gompertz model
-                method="inla",                                   # instructs R to use INLA/Bayesian modelling
-)
-
-m_13=fit.models(Surv(time,status)~as.factor(treat),              # model 'formula': defines the time and censoring indicator and the covariates
-                data=msmdata %>% filter(trans==2),               # subsets the msmdata by filtering transition number 2 (pre-progression->death)
-                distr="gom",                                     # selects the Gompertz model
-                method="inla",                                   # instructs R to use INLA/Bayesian modelling
-)
-
-m_23=fit.models(Surv(time,status)~as.factor(treat),              # model 'formula': defines the time and censoring indicator and the covariates
-                data=msmdata %>% filter(trans==3),               # subsets the msmdata by filtering transition number 3 (progressed->death)
-                distr="gom",                                     # selects the Gompertz model
-                method="inla",                                   # instructs R to use INLA/Bayesian modelling
-)
-
+                priors=list(gom=list(a_alpha=1.5,b_alpha=1.5)))  # specifies the informative prior```
 
 # You now need to 'source' the script 'survHE_utils.R' to load up a bunch of useful functions to then run the rest of the analysis
 source("survHE_utils.R")

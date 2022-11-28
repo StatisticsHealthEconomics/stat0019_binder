@@ -1,12 +1,8 @@
-# Sets the working directory
-setwd("INSERT_PATH_HERE")
-
 # Loads the relevant packages
-install.packages("survHE")
 library(survHE)
 
 # Loads & visualises the data
-load("survival_data.Rdata")
+load(here::here("practical","08_survival","survival_data.Rdata"))
 head(dat)
 
 # Defines the model formula, including the treatment arm as the only covariate
