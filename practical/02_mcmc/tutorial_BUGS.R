@@ -51,7 +51,7 @@ model.code=function(){
   P.crit <- step(y.pred - ncrit + 0.5) # =1 if y.pred >= ncrit,
 }
 model <- bugs(
-  data=dataJags,parameters.to.save=c("y.pred","theta","P.crit"),
+  data=data,parameters.to.save=c("y.pred","theta","P.crit"),
   inits=NULL,n.chains=2,n.iter=5000,n.burnin=0,DIC=TRUE,
   # This specifies the model code as the function 'model.code'
   model.file=model.code,
