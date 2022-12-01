@@ -72,3 +72,23 @@ bmhe::diagplot(model,what="n.eff")
 
 # Plots the posterior distributions
 bmhe::posteriorplot(model,plot="bar")
+
+# Manually computes PSR and n_eff using the simulations from the model
+# Use the first node
+x=model$sims.array[,,1]
+
+# Defines the relevant quantities
+# Number of simulations (rows of x)
+nsims=nrow(x)
+# Number of chains (columsn of x)
+nchains=ncol(x)
+# Vector of variance for simulated values in each chain
+sigma2.hat=apply(x,2,var)
+# Vector of mean for simulated values in each chain
+mu.hat=apply(x,2,mean)
+W=mean(sigma2.hat)
+B=nsims*var(mu.hat)
+
+# Now can compute PSR (Rhat) + neff
+Rhat=sqrt( (1/W) * ( ((nsims-1)/nsims) * W + (1/nsims) * B ))
+neff=nchains * nsims * min((1/B)*((nsims-1)/nsims) * W + (1/nsims) * B, 1)
