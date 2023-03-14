@@ -5,7 +5,7 @@
 library(dplyr)
 
 # Set the working directory, for example something like 
-setwd(here::here("practical","09_mm"))
+setwd(here::here("practical","08_mm"))
 
 # Now loads the data. Notice the 'pipe' operator '%>%' (https://cran.r-project.org/web/packages/magrittr/vignettes/magrittr.html) 
 data=read.table("data.txt",header=T,sep="\t") %>% 
@@ -94,29 +94,33 @@ library(survHE)
 # Runs survival models on the specific subsets to obtain estimate of the various transition probabilities
 m_12=fit.models(Surv(time,status)~as.factor(treat),              # model 'formula': defines the time and censoring indicator and the covariates
                 data=msmdata %>% filter(trans==1),               # subsets the msmdata by filtering transition number 1 (pre-progression->progressed)
-                distr="gom",                                     # selects the Gompertz model
-                method="hmc",                                    # instructs R to use HMC/Bayesian modelling
-                priors=list(gom=list(a_alpha=1.5,b_alpha=1.5)))  # specifies the informative prior
+                distr="gom"#,                                    # selects the Gompertz model
+# You can run the Bayesian version of this model by uncommenting these two lines + installing 'survHEhmc'
+#                method="hmc",                                    # instructs R to use HMC/Bayesian modelling
+#                priors=list(gom=list(a_alpha=1.5,b_alpha=1.5))   # specifies the informative prior
+)
 
 m_13=fit.models(Surv(time,status)~as.factor(treat),              # model 'formula': defines the time and censoring indicator and the covariates
                 data=msmdata %>% filter(trans==2),               # subsets the msmdata by filtering transition number 2 (pre-progression->death)
-                distr="gom",                                     # selects the Gompertz model
-                method="hmc",                                    # instructs R to use HMC/Bayesian modelling
-                priors=list(gom=list(a_alpha=1.5,b_alpha=1.5)))  # specifies the informative prior
+                distr="gom"#,                                    # selects the Gompertz model
+# You can run the Bayesian version of this model by uncommenting these two lines + installing 'survHEhmc'
+#                method="hmc",                                    # instructs R to use HMC/Bayesian modelling
+#                priors=list(gom=list(a_alpha=1.5,b_alpha=1.5))   # specifies the informative prior
+)
 
 m_23=fit.models(Surv(time,status)~as.factor(treat),              # model 'formula': defines the time and censoring indicator and the covariates
                 data=msmdata %>% filter(trans==3),               # subsets the msmdata by filtering transition number 3 (progressed->death)
-                distr="gom",                                     # selects the Gompertz model
-                method="hmc",                                    # instructs R to use HMC/Bayesian modelling
-                priors=list(gom=list(a_alpha=1.5,b_alpha=1.5)))  # specifies the informative prior```
-
-# You now need to 'source' the script 'survHE_utils.R' to load up a bunch of useful functions to then run the rest of the analysis
-source("survHE_utils.R")
+                distr="gom"#,                                    # selects the Gompertz model
+# You can run the Bayesian version of this model by uncommenting these two lines + installing 'survHEhmc'
+#                method="hmc",                                    # instructs R to use HMC/Bayesian modelling
+#                priors=list(gom=list(a_alpha=1.5,b_alpha=1.5))   # specifies the informative prior
+)
 
 # Now run the function 'three_state_mm', which in turns calls the function 'make.transition.probs' (which computes
 # the transition probabilities from the survival curves) and then 'make_state_occupancy' (to compute the number of 
-# people in each state at each time point in the follow up).
-mm=three_state_mm(
+# people in each state at each time point in the follow up). These functions are "hidden" inside 'survHE', so you
+# need to use the ":::" notation to access them!
+mm=survHE:::three_state_mm(
   m_12,m_13,m_23,         # these are the three objects containing the parameters estimates
   t=seq(0,130),           # specifies that the Markov model needs to be run for discrete times from 0 to 130 (months)
   nsim=1,                 # only uses 1 simulation from the distribution of the model parameters (the mean)
