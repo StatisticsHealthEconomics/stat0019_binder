@@ -57,7 +57,7 @@ msmdata=
       to=3,                                                               # arriving state (3="Death")
       trans=2,                                                            # transition ID (2="Pre-progression -> Death")
       Tstart=0,                                                           # entry time
-      Tstop=prog_t,                                                       # exit time (time at which the event happens)
+      Tstop=death_t,                                                      # exit time (time at which the event happens)
       time=Tstop-Tstart,                                                  # observed time
       status=case_when(                                                   # event indicator
         (death==1 & prog_t==death_t)~1,                                   #   if death then 1
@@ -92,28 +92,31 @@ msmdata
 library(survHE)
 
 # Runs survival models on the specific subsets to obtain estimate of the various transition probabilities
+# **NB**: Uses the INLA module to run the Bayesian analysis
 m_12=fit.models(Surv(time,status)~as.factor(treat),              # model 'formula': defines the time and censoring indicator and the covariates
                 data=msmdata %>% filter(trans==1),               # subsets the msmdata by filtering transition number 1 (pre-progression->progressed)
-                distr="gom"#,                                    # selects the Gompertz model
+                distr="gom",                                     # selects the Gompertz model
+                method="inla",                                   # instructs R to use INLA/Bayesian modelling
+                priors=list(gom=list(a_alpha=1.5,b_alpha=1.5))   # specifies the informative prior
+)
 # You can run the Bayesian version of this model by uncommenting these two lines + installing 'survHEhmc'
+# **BUT**: this will break on the Binder VM (because it doesn't have enough memory!)
 #                method="hmc",                                    # instructs R to use HMC/Bayesian modelling
 #                priors=list(gom=list(a_alpha=1.5,b_alpha=1.5))   # specifies the informative prior
-)
+
 
 m_13=fit.models(Surv(time,status)~as.factor(treat),              # model 'formula': defines the time and censoring indicator and the covariates
                 data=msmdata %>% filter(trans==2),               # subsets the msmdata by filtering transition number 2 (pre-progression->death)
-                distr="gom"#,                                    # selects the Gompertz model
-# You can run the Bayesian version of this model by uncommenting these two lines + installing 'survHEhmc'
-#                method="hmc",                                    # instructs R to use HMC/Bayesian modelling
-#                priors=list(gom=list(a_alpha=1.5,b_alpha=1.5))   # specifies the informative prior
+                distr="gom",                                     # selects the Gompertz model
+                method="inla",                                   # instructs R to use INLA/Bayesian modelling
+                priors=list(gom=list(a_alpha=1.5,b_alpha=1.5))   # specifies the informative prior
 )
 
 m_23=fit.models(Surv(time,status)~as.factor(treat),              # model 'formula': defines the time and censoring indicator and the covariates
                 data=msmdata %>% filter(trans==3),               # subsets the msmdata by filtering transition number 3 (progressed->death)
-                distr="gom"#,                                    # selects the Gompertz model
-# You can run the Bayesian version of this model by uncommenting these two lines + installing 'survHEhmc'
-#                method="hmc",                                    # instructs R to use HMC/Bayesian modelling
-#                priors=list(gom=list(a_alpha=1.5,b_alpha=1.5))   # specifies the informative prior
+                distr="gom",                                     # selects the Gompertz model
+                method="inla",                                   # instructs R to use INLA/Bayesian modelling
+                priors=list(gom=list(a_alpha=1.5,b_alpha=1.5))   # specifies the informative prior
 )
 
 # Now run the function 'three_state_mm', which in turns calls the function 'make.transition.probs' (which computes
@@ -134,4 +137,4 @@ mm
 # underlying parameters and then the Markov model.
 
 # Finally, can visualise the Markov trace, using the specialised function 'markov_trace'
-markov_trace(mm)
+survHE:::markov_trace(mm)
