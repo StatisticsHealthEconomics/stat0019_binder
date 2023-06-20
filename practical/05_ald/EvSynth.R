@@ -76,11 +76,11 @@ inits <- function(){
 # Sets the number of iterations, burnin and thinning
 n.iter <- 10000
 n.burnin <- 9500
-n.thin <- 20
+n.thin <- 2
 
 # Finally calls OpenBUGS to do the MCMC run and saves results to the object "es"
 es <- bugs(data=data,inits=inits,parameters.to.save=params,model.file=filein,
-	n.chains=2, n.iter, n.burnin, n.thin, DIC=TRUE, working.directory=working.dir)
+	n.chains=2, n.iter, n.burnin, n.thin, DIC=TRUE)
 
 # Displays the summary statistics
 print(es,digits=3,intervals=c(0.025, 0.975))
@@ -103,4 +103,3 @@ e[,2] <- -l*p2
 library(BCEA)
 treats <- c("status quo","prophylaxis with NIs")
 m <- bcea(e,c,ref=2,treats,Kmax=10000)
-

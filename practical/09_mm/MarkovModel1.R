@@ -42,7 +42,7 @@ alpha.1 <- rep(scale,S)
 # Run the MCMC model
 library(R2OpenBUGS)
 dataBugs <- list("n.0","n.1","r.0","r.1","alpha.0","alpha.1","S") 
-filein <- here::here("practical","09_mm","MarkovModel1.txt")
+filein <- here::here("practical","08_mm","MarkovModel1.txt")
 params <- c("lambda.0","lambda.1")
 # lambda.0 and lambda.1 need: 4 random rows (even Hex has random parameters) 
 #	                      1 row of NAs (because TP is deterministic)
@@ -120,6 +120,19 @@ for (i in 1:n.sims) {
 		}
 	}
 }
+# NB: If you are using JAGS, however, your output lambda.0 and lambda.1 will include the 
+#     last row of the transition matrices for each simulation (so all the transitions off
+#     the absorbing state, whose probabilities are 0 to go away and 1 to stay, with no
+#     variance whatsoever). So if you have used JAGS, all you need to do is the following
+for (i in 1:n.sims) {
+	for (j in 2:(J+1)){
+		for (s in 1:S){
+		   # Use the new matrices lam0 and lam1 to do the matrix multiplication
+			m.0[i,s,j] <- sum(m.0[i,,j-1]*lambda.0[i,,s])
+			m.1[i,s,j] <- sum(m.1[i,,j-1]*lambda.1[i,,s])
+		}
+	}
+}
 
 # Barplot of the number of people in each state @ each time point
 par(mfrow=c(1,2))
@@ -182,4 +195,3 @@ m <- bcea(e,c,ref=2,interventions=ints,Kmax=300)
 contour2(m,300)
 plot(m)
 summary(m)
-
