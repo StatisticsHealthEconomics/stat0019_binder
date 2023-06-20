@@ -15,5 +15,7 @@ Alternatively, you can use this repository onto your computer and use it locally
 
 If you are not familiar with GitHub, your best option is probably to simply download the content of this repository. 
 
-- Click on green button labelled as `<> Code` in the top-right corner and then click on `Download zip`.
+- Click on green button labelled as `<> Code` in the top-right corner and then click on `Download zip`, as shown in the picture below.
 ![](clone-download.png)
+Once the download is complete, unzip the folder.
+
