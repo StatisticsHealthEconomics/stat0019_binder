@@ -1,89 +1,218 @@
-##########################################################
-### Model Code for model published in Brennan and     ####
-### Kharroubi and modified by Menzies included in the ####
-### paper "Estimating the Expected Value of Sample    #### 
-### Information across Different Sample Sizes using   ####
-### Moment Matching and Non-Linear Regression"        ####
-###                                                   ####
-### Modified for use within the EVSI package.         ####
-### Copyright: Anna Heath 2018                        ####
-##########################################################
-
-####Required Pacakges
-remotes::install_github("annaheath/EVSI")
+library(voi)
 library(R2OpenBUGS)
-library(BCEA)
-library(EVSI)
 
-####Model Code for BUGS
-Model<-function(){
+### Model Specification
+generate_psa_parameters <- function(n){
+  
+  ## Initialise parameter matrix
+  theta <- matrix(NA, ncol = 19, nrow = n)
   #PSA distributions for the parameters
   #All parameters are normal distributions
-  #Parameterised in terms of mean and precision
-  theta.1~dnorm(10000,0.01)
-  theta.11~dnorm(15000,0.01)
-  theta.2~dnorm(0.1,2500)
-  theta.12~dnorm(.08,2500)
-  theta.3~dnorm(5.2,1)
-  theta.13~dnorm(6.1,1)
-  theta.4~dnorm(4000,2.5E-07)
-  theta.8~dnorm(.25,100)
-  theta.17~dnorm(.20,400)
-  theta.9~dnorm(-.1,2500)
-  theta.18~dnorm(-.1,2500)
-  theta.10~dnorm(.5,25)
-  theta.19~dnorm(.5,25)
+  theta[, 1] <- rnorm(n, 10000, 10)
+  theta[, 11] <- rnorm(n, 15000, 10)
+  theta[, 2] <- rnorm(n, 0.1, 0.02)
+  theta[, 12] <- rnorm(n, .08, 0.02)
+  theta[, 3] <- rnorm(n, 5.2, 1)
+  theta[, 13] <- rnorm(n, 6.1, 1)
+  theta[, 4] <- rnorm(n, 4000, 2000)
+  theta[, 8] <- rnorm(n, 0.25, 0.01)
+  theta[, 17] <- rnorm(n, 0.20, 0.05)
+  theta[, 9] <- rnorm(n, -0.1, 0.02)
+  theta[, 18] <- rnorm(n, -0.1, 0.02)
+  theta[, 10] <- rnorm(n, 0.5, 0.2)
+  theta[, 19] <- rnorm(n, 0.5, 0.2)
   
-  #Correlated PSA distributions requires multivariate normal distribution
-  #Parameters of the multivariate normal distribution must be specified as data.
-  #Parameterised in terms of a mean vector and a precision matrix
-  cor.theta.1[1:4]~dmnorm(Mu.1[],Tau.1[,])
-  theta.5<-cor.theta.1[1]
-  theta.7<-cor.theta.1[3]
-  theta.14<-cor.theta.1[2]
-  theta.16<-cor.theta.1[4]
+  ## Correlated parameters PSA
+  Mu.1 <- c(.7, .8, 3, 3)
+  Mu.2 <- c(.3, .3)
   
-  cor.theta.2[1:2]~dmnorm(Mu.2[],Tau.2[,])
-  theta.6<-cor.theta.2[1]
-  theta.15<-cor.theta.2[2]
+  # Correlation Matrices - standard deviations
+  sd.5 <- 0.1
+  sd.6 <- 0.1
+  sd.7 <- 0.5
+  sd.14 <- 0.1
+  sd.15 <- 0.05
+  sd.16 <- 1
+  rho <- 0.6 # Correlation
   
-  ##Sampling distribution for the data
-  #Sampling from a multivariate normal distribution
-  #Within EVSI package - cannot have multivariate data collection
-  #Decompose multivariate normal into two scalar data points with conditional mean and variance
-  #Decomposition found in "Bayesian Methods in Health Economics" Baio (2012), Page 156
-  tau.14<-tau.X.14/(1-rho.X*rho.X)
-  for(i in 1:N){
-    X.5[i]~dnorm(theta.5,tau.X.5)
-    mu.14[i]<-theta.14+sqrt(tau.X.5/tau.X.14)*rho.X*(X.5[i]-theta.5)
-    X.14[i]~dnorm(mu.14[i],tau.14)
-  }
+  # Definie variance matrices
+  S.1 <- matrix(
+    #Vector containing all the values to enter into the matrix
+    c(sd.5^2,rho*sd.14*sd.5,rho*sd.5*sd.7,rho*sd.5*sd.16,
+      rho*sd.5*sd.14,sd.14^2,rho*sd.14*sd.7,rho*sd.14*sd.16,
+      rho*sd.5*sd.7,sd.14*rho*sd.7,sd.7^2,rho*sd.16*sd.7,
+      rho*sd.5*sd.16,sd.14*rho*sd.16,rho*sd.7*sd.16,sd.16^2),
+    #Specify the size of the matrix
+    nrow=4)
+  
+  
+  S.2<-matrix(
+    #Vector containing all the values to enter into the matrix
+    c(sd.6^2,rho*sd.6*sd.15,
+      rho*sd.6*sd.15,sd.15^2),
+    #Specify the size of the matrix
+    nrow=2)
+  
+  theta[, c(5, 14, 7, 16)] <- MASS::mvrnorm(n, Mu.1, S.1)
+  theta[, c(6, 15)] <- MASS::mvrnorm(n, Mu.2, S.2)
+  
+  colnames(theta) <- paste("theta_", 1:19, sep = "")
+  return(data.frame(theta))
 }
 
-#This writes the model we just defined as a text file for use within BUGS 
-filein.model <- here::here("practical","14_evsi_mc","Model_File.txt")
-write.model(Model,filein.model)
+calculate_costs_effects <- function(theta_1, theta_2, theta_3,
+                                    theta_4, theta_5, theta_6,
+                                    theta_7, theta_8, theta_9,
+                                    theta_10, theta_11, theta_12,
+                                    theta_13, theta_14, theta_15,
+                                    theta_16, theta_17, theta_18,
+                                    theta_19){
+  ## Effects
+  e_treatment1 <- (theta_5*theta_6*theta_7)+(theta_8*theta_9*theta_10)
+  e_treatment2 <- (theta_14*theta_15*theta_16)+(theta_17*theta_18*theta_19)
+  e<-c(e_treatment1, e_treatment2)
+  ## Costs
+  c_treatment1 <- (theta_1+theta_2*theta_3*theta_4)
+  c_treatment2 <- (theta_11+theta_12*theta_13*theta_4)
+  c<-c(c_treatment1, c_treatment2)
+  
+  output <- array(NA, dim = c(2, length(e)),
+                  dimnames = list(c("Effects", "Costs"),
+                                  c("SoC", "Novel")))
+  output[1, ] <- e
+  output[2, ] <- c
+  return(output)
+  
+}
 
-####Define the parameters of the multivariate normal priors
-#Within BUGS, we define a mean vector and a precision matrix.
-#Mean Vectors
-Mu.1<-c(.7,.8,3,3)
+calculate_net_benefit <- function(
+    costs_effects,
+    wtp)
+{
+  if(!is.null(dim(costs_effects))){
+    nb <- wtp * costs_effects[, 1, ] - 
+      costs_effects[, 2, ]
+  }
+  
+  return(nb)
+}
 
-Mu.2<-c(.3,.3)
+## Run the model for initial PSA
+n_psa_size <- 10000
+params <- generate_psa_parameters(n_psa_size)
+m_costs_effects <- array(NA, dim = c(n_psa_size, 2, 2))
+for(s in 1:n_psa_size){
+  formals(calculate_costs_effects) <- params[s, ]
+  m_costs_effects[s, , ] <- calculate_costs_effects()
+}
+# Set the column names for the output
+dimnames(m_costs_effects)[2:3] <- dimnames(
+  calculate_costs_effects()
+)
 
-#Precision Matrices
-#The original model worked with standard deviations so first
-#specify all the standard deviations
-sd.5<-0.1
-sd.6<-0.1
-sd.7<-0.5
-sd.14<-0.1
-sd.15<-0.05
-sd.16<-1
-rho<-0.6
+### For EVSI analysis, we need to compute a model object to save the model
+# results
+model_output <- list(e = m_costs_effects[, "Effects", ],
+                     c = m_costs_effects[, "Costs", ],
+                     k = seq(0, 50000, length.out = 501))
 
-#Start by defining variance matrix using the matrix command
-S.1<-matrix(
+### EVPI
+EVPI <- evpi(model_output)
+K = 10000
+EVPI$evpi[EVPI$k == K]
+
+### EVSI
+# Create function to generate data
+data_sim <- function(inputs, n = 250){
+  if(length(n) > 1){
+    n <- n[1]
+  }
+  theta_5 <- inputs[, "theta_5"]
+  theta_14 <- inputs[, "theta_14"]
+  
+  # Specify individual level standard devation
+  sd.X.5 <- 0.2
+  sd.X.14 <- 0.2
+  rho.X <- 0.6
+    sd.14 <- sd.X.14 * sqrt(1 - rho.X * rho.X)
+  X <- matrix(NA, nrow = length(theta_5), ncol = 2 * n)
+  for(i in 1:length(theta_5)){
+    X[i, 1:n] <- rnorm(n, mean = theta_5[i], sd = sd.X.5)
+    mu.14 <- theta_14[i] + sd.X.14 / sd.X.5 * rho.X * (X[i, 1:n] - theta_5[i])
+    X[i, (n + 1):(2 * n)] <- rnorm(n, mean = mu.14, sd = sd.14)
+  }
+  
+  return(data.frame(X)) 
+}
+
+data_analysis_fn <- function(data, args, pars){
+  Model<- "model{
+    #Correlated PSA distributions requires multivariate normal distribution
+    cor.theta.1[1:4] ~ dmnorm(Mu.1[], Tau.1[,])
+    theta_5 <- cor.theta.1[1]
+    theta_7 <- cor.theta.1[3]
+    theta_14 <- cor.theta.1[2]
+    theta_16 <- cor.theta.1[4]
+
+    ##Sampling distribution for the data
+    #Decompose multivariate normal into two scalar data points with conditional mean and variance
+    #Decomposition found in Baio (2012), Page 156
+    tau.14 <- tau.X.14 / (1 - rho.X * rho.X)
+    for(i in 1:N){
+      X.5[i] ~ dnorm(theta_5, tau.X.5)
+      mu.14[i] <- theta_14 + sqrt(tau.X.5 / tau.X.14) * rho.X *
+        (X.5[i] - theta_5)
+      X.14[i] ~ dnorm(mu.14[i], tau.14)
+    }
+  }"
+  filein <- file.path(tempdir(),fileext="datmodel.txt")
+  cat(Model, file=filein)
+  
+  data <- as.vector(as.matrix(data))
+  data_load <- list(
+    Mu.1 = args$Mu.1,
+    Tau.1 = args$Tau.1,
+    tau.X.14 = args$tau.X.14,
+    tau.X.5 = args$tau.X.5,
+    rho.X = args$rho.X,
+    N = args$n,
+    X.5 = data[1:args$n],
+    X.14 = data[(args$n + 1):(2 * args$n)]
+  )
+  
+  bugs.data <- bugs(
+    data = data_load,
+    parameters.to.save = pars,
+    model.file = filein,
+    inits = NULL,
+    n.chains = 1,
+    n.iter = args$n.iter,
+    n.thin = 1,
+    n.burnin = 250)
+  
+  theta_5 <- bugs.data$sims.matrix[, "theta_5"]
+  theta_14 <- bugs.data$sims.matrix[, "theta_14"]
+  theta_7 <- bugs.data$sims.matrix[, "theta_7"]
+  theta_16 <- bugs.data$sims.matrix[, "theta_16"]
+  return(data.frame(theta_5 = theta_5,
+                    theta_14 = theta_14,
+                    theta_7 = theta_7,
+                    theta_16 = theta_16))
+}
+
+## Data to be loaded into the analysis function
+Mu.1 <- c(.7, .8, 3, 3)
+# Correlation Matrices - standard deviations
+sd.5 <- 0.1
+sd.6 <- 0.1
+sd.7 <- 0.5
+sd.14 <- 0.1
+sd.15 <- 0.05
+sd.16 <- 1
+rho <- 0.6 # Correlation
+
+# Definie variance matrices
+S.1 <- matrix(
   #Vector containing all the values to enter into the matrix
   c(sd.5^2,rho*sd.14*sd.5,rho*sd.5*sd.7,rho*sd.5*sd.16,
     rho*sd.5*sd.14,sd.14^2,rho*sd.14*sd.7,rho*sd.14*sd.16,
@@ -92,284 +221,46 @@ S.1<-matrix(
   #Specify the size of the matrix
   nrow=4)
 
+# Specify individual level standard devation
+sd.X.5 <- 0.2
+sd.X.14 <- 0.2
+rho.X <- 0.6
 
-S.2<-matrix(
-  #Vector containing all the values to enter into the matrix
-  c(sd.6^2,rho*sd.6*sd.15,
-    rho*sd.6*sd.15,sd.15^2),
-  #Specify the size of the matrix
-  nrow=2)
-
-#Precision matrix is the inverse of variance matrix
-#solve finds the matrix inverse.
-Tau.1<-solve(S.1)
-Tau.2<-solve(S.2)
-
-###Define the parameters for the sampling distribution of data.
-#This calculates the precision from the standard deviation
-tau.X.5<-1/0.2^2
-tau.X.14<-1/0.2^2
-rho.X<-0.6
-
-###Define Health Economic model
-#Functions to calculate the health economic outcomes from the model parameters
-#The R syntax to create a function uses the command function()
-#Within the brackets you write the arguments of the new function, these are
-#the values you give to the function
-#Inside the curly {} brackets you write what you want the function to do.
-#Here we calculate the effects measure for the treatments from the parameters
-#The return() function tells R what it should output - in this case a vector of the
-#effects across the two treatments.
-
-#These functions must take ONE value for each of the model parameters and output
-#either the cost or effects for each treatment as a vector
-effects<-function(theta.5,theta.6,theta.7,theta.8,theta.9,theta.10,
-                  theta.14,theta.15,theta.16,theta.17,theta.18,theta.19){
-  #This is a decision tree model so the effects are in the sum/product form.
-  e.treatment1<-(theta.5*theta.6*theta.7)+(theta.8*theta.9*theta.10)
-  e.treatment2<-(theta.14*theta.15*theta.16)+(theta.17*theta.18*theta.19)
-    e<-c(e.treatment1,e.treatment2)
-  return(e)
-}
-
-costs<-function(theta.1,theta.2,theta.3,theta.4,
-                theta.11,theta.12,theta.13){
-  #This is a decision tree model so the costs are in the sum/product form.
-  c.treatment1<-(theta.1+theta.2*theta.3*theta.4)
-  c.treatment2<-(theta.11+theta.12*theta.13*theta.4)
-  c<-c(c.treatment1,c.treatment2)
-  return(c)
-}
-
-#EVSI
-#Specify a list of data that needs to be used by the BUGS model
-#In this example, we need the mean vectors and precision matrices 
-#for the multivaraite normal priors and the precision for the 
-#sampling distribution of the data.
-data.evsi<-list(Mu.1=Mu.1,
-               Mu.2=Mu.2,
-               Tau.1=Tau.1,
-               Tau.2=Tau.2,
-               tau.X.5=tau.X.5,
-               tau.X.14=tau.X.14,
-               rho.X=rho.X)
-
-#This function uses BCEA to perform the standard PSA analysis and to calculate the EVPPI
-#Then it calculates the variance of the posterior distribution across different sample sizes
-#Finally, it fits the non-linear model to calculate the EVSI across sample size.
-g <- mm.post.var(
-  #The place where we saved the BUGS model.
-  filein.model,
-  #The variable names for the data that we will collect in the future trial
-  c("X.5","X.14"),
-  #The variable name of the sample size (i.e. how many data points we will collect)
-  "N",
-  #The smallest and largest sample sizes for which we calculate the EVSI
-  c(5,200),
-  #The function that calculates the effects from the parameters
-  effects,
-  #The function that calculates the costs from the parameters
-  costs,
-  #The variable names of the parameters that are updated by the future trial
-  #This is used to calculate the EVPPI for the focal parameters
-  parameters=c("theta.5","theta.14"),
-  #Any additional data that is needed for the BUGS model to run
-  #In this case, the mean vectors and precision matrices
-  #If you had data from a previous trial it was be included here.
-  data.stats=data.evsi,
-  #The Bayesian updating should be done with BUGS (rather than JAGS).
-  update="bugs",
-  #The number of iterations taken from each posterior distribution to
-  #calculate the posterior variance.
-  n.iter=1000,
-  #The number of "future" posterior samples that should be taken
-  Q=50
+args.list <- list(
+  Mu.1 = Mu.1,
+  Tau.1 = solve(S.1), # precision matrix
+  tau.X.14 = 1 / sd.X.14 ^ 2,
+  tau.X.5 = 1 / sd.X.5 ^ 2,
+  rho.X = rho.X,
+  n = 250,
+  n.iter = 1000
 )
 
-#Using the previous function, evsi.calc calculates the EVSI across different
-#sample sizes and willingness-to-pay parameters by rescaling the fitted values
-#from the EVPPI calculations.
-evsi.BK<-evsi.calc(g)
+evsi_single_n <- evsi(outputs = model_output,
+             inputs = params,
+             pars = c("theta_5", "theta_14", "theta_7", "theta_16"),
+             pars_datagen = c("theta_5", "theta_14"),
+             n = 250,
+             method = "mm",
+             datagen_fn = data_sim,
+             model_fn = calculate_costs_effects,
+             analysis_args = args.list,
+             analysis_fn = data_analysis_fn,
+             par_fn = generate_psa_parameters,
+             Q = 50)
 
-#Launches the WebApp so you can see the results of the EVSI calculation
-launch.App(evsi.BK)
-
-
-####################################################  
-#### Section 2                                  ####
-####################################################
-
-
-###Simulate from the BUGS model to perform PSA
-#This means that you can have more PSA simulations than used for the 
-#EVSI calculations
-#You can also check the model fitting of the EVPPI or use non-standard
-#calculation methods
-#You can also control the PSA analysis - here we take the willingness-to-pay
-#up to 200000 as this model is from an American persepective.
-
-#Create a list of prior parameters for BUGS
-prior.spec<-list(Mu.1=Mu.1,
-                 Mu.2=Mu.2,
-                 Tau.1=Tau.1,
-                 Tau.2=Tau.2,
-                 tau.X.5=tau.X.5,
-                 tau.X.14=tau.X.14,
-                 rho.X=rho.X,
-                 #Here you need to specify N as a parameter of the model
-                 #but we set it to 0 as we don't have any data.
-                 N=1)
-
-#Parameters to control the MCMC for the PSA
-n.chains<-3        #Number of chains for MCMC
-n.burnin <- 1000   #Number of burn in iterations
-n.thin<-20         #Thinning
-n.iter <- ceiling(10000/n.chains + n.burnin) #Total number of iterations for each chain
-#Using these MCMC controls gives 10000 PSA simulations
-
-#We need to monitor all the model parameters so we can perform the health economic analysis
-parameters.to.save <- c("theta.1","theta.2","theta.3","theta.4","theta.5",
-                        "theta.6","theta.7","theta.8","theta.9","theta.10",
-                        "theta.11","theta.12","theta.13","theta.14","theta.15",
-                        "theta.16","theta.17","theta.18","theta.19")
-
-#Use BUGS to sample from the PSA distributions
-model.output <- bugs(
-  #Set the data as our prior parameters
-  data =  prior.spec,
-  inits=NULL,
-  #monitor all model parameters
-  parameters.to.save = parameters.to.save,
-  #use the model file created earlier
-  model.file = filein.model,
-  #control the MCMC
-  n.chains = n.chains, 
-  n.iter = n.iter, 
-  n.thin = n.thin, 
-  n.burnin = n.burnin,
-  #do not DIC
-  DIC=F) 
-
-###Perform PSA using the parameter simulations and the model functions
-S<-length(model.output$sims.list$theta.1)
-e<-array(dim=c(S,2))
-#The function take 1 value for each of the model parameters and gives one
-#value of the effects for ecah treatment.
-
-#Here we loop through all the PSA simulations to calculate the effects for 
-#each simulation.
-for(i in 1:S){
-  e[i,]<-effects(model.output$sims.list$theta.5[i],
-                 model.output$sims.list$theta.6[i],
-                 model.output$sims.list$theta.7[i],
-                 model.output$sims.list$theta.8[i],
-                 model.output$sims.list$theta.9[i],
-                 model.output$sims.list$theta.10[i],
-                 model.output$sims.list$theta.14[i],
-                 model.output$sims.list$theta.15[i],
-                 model.output$sims.list$theta.16[i],
-                 model.output$sims.list$theta.17[i],
-                 model.output$sims.list$theta.18[i],
-                 model.output$sims.list$theta.19[i])
-}
+evsi_multi_n <- evsi(outputs = model_output,
+     inputs = params,
+     pars = c("theta_5", "theta_14", "theta_7", "theta_16"),
+     pars_datagen = c("theta_5", "theta_14"),
+     n = seq(30,200, by = 10),
+     method = "mm",
+     datagen_fn = data_sim,
+     model_fn = calculate_costs_effects,
+     analysis_args = args.list,
+     analysis_fn = data_analysis_fn,
+     par_fn = generate_psa_parameters,
+     Q = 50)
 
 
-c<-array(dim=c(S,2))
-for(i in 1:S){
-  c[i,]<-costs(model.output$sims.list$theta.1[i],
-               model.output$sims.list$theta.2[i],
-               model.output$sims.list$theta.3[i],
-               model.output$sims.list$theta.4[i],
-               model.output$sims.list$theta.11[i],
-               model.output$sims.list$theta.12[i],
-               model.output$sims.list$theta.13[i])
-}
 
-###Present PSA results using the BCEA package
-#Here we change the maximum willingness-to-pay
-he<-bcea(e,c,Kmax=200000,ref=2,interventions=c("SoC","Treatment"))
-#Here we plot the cost-effectiveness results for a threshold WTP of 100000
-plot(he,wtp=100000)
-
-
-###Obtain Value of Information results
-#EVPI
-evi.plot(he)
-
-#EVPPI - using evppi
-#To start we need the parameter simulations to be in the right form
-#They are saved in model.output$sims.matrix but are not named
-#For example:
-model.output$sims.matrix$theta.1
-#gives an error.
-
-#This command formally names each column using the column names
-input.matrix<-as.data.frame(model.output$sims.matrix)
-names(input.matrix)<-colnames(model.output$sims.matrix)
-#Try
-input.matrix$theta.1
-#Now we can call all parameters by their name and use these names in the EVPPI function
-evi<-evppi(c("theta.5","theta.14"),input.matrix,he,method="gam")
-plot(evi)
-evi$evppi[which(he$k==100000)]
-
-#Previously we have a warning that the data cannot be done within the EVSI package
-#We now generate the data externally to the mm.post.var function.
-#gen.quantiles selects the quantiles and sample sizes that can be used to generate the
-#future data
-theta.gen <- gen.quantiles(c("theta.5","theta.14"),input.matrix,50,c(5,200))
-#Using the updated code for the BUGS models to ensure that the data are compatible
-tau.14<-tau.X.14/(1-rho.X*rho.X)
-data.list <- list()
-for(i in 1:50){
-  X.5 <- rnorm(theta.gen[i,"N"],theta.gen[i,"theta.5"],tau.X.5)
-  mu.14 <- theta.gen[i,"theta.14"]+sqrt(tau.X.5/tau.X.14)*rho.X*
-    (X.5 - theta.gen[i,"theta.5"])
-  X.14 <- rnorm(theta.gen[i,"N"],mu.14,tau.14)
-  #Data must be stored as a list of named lists
-  #Each list element is a set of data for a BUGS model.
-  data.list[[i]] <- list(X.5 = X.5,X.14 = X.14)
-}
-
-###Calculating the EVSI using our updated cost-effectiveness results.
-#This function calculates the variance of the posterior distribution 
-#across different sample sizes
-g<-mm.post.var(
-  #The place where we saved the BUGS model.
-  filein.model,
-  #The list containing the future data that we generated above
-  data.list,
-  #The variable name of the sample size (i.e. how many data points we will collect)
-  "N",
-  #The sample sizes we used to generate the future data
-  theta.gen[,"N"],
-  #The function that calculates the effects from the parameters
-  effects,
-  #The function that calculates the costs from the parameters
-  costs,
-  #The bcea object containing all the cost-effectiveness analysis
-  he=he,
-  #The evppi object containing the EVPPI results
-  #Because we have included the evppi object, we don't need to specify
-  #the parameters that will be informed by the future data collection.
-  evi=evi,
-  #Any additional data that is needed for the BUGS model to run
-  #In this case, the mean vectors and precision matrices
-  #If you had data from a previous trial it was be included here.
-  data.stats=data.evsi,
-  #The Bayesian updating should be done with BUGS (rather than JAGS).
-  update="bugs",
-  #The number of iterations taken from each posterior distribution to
-  #calculate the posterior variance.
-  n.iter=1000,
-  #The number of "future" posterior samples that should be taken
-  Q=50
-)
-
-#Using the previous function, evsi.calc calculates the EVSI across different
-#sample sizes and willingness-to-pay parameters by rescaling the fitted values
-#from the EVPPI calculations.
-evsi.BK<-evsi.calc(g)
-
-#Launches the WebApp so you can see the results of the EVSI calculation
-launch.App(evsi.BK)

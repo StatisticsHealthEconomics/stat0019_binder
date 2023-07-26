@@ -88,6 +88,9 @@ print(es,digits=3,intervals=c(0.025, 0.975))
 # Convergence check through traceplots (example for node p1)
 plot(es$sims.list$p1[1:500],t="l",col="blue",ylab="p1")
 points(es$sims.list$p1[501:1000],t="l",col="red")
+# Or can use bmhe to have automated (and nicer) plots
+bmhe::traceplot(es,"p1")
+bmhe::traceplot(es)
 
 # Attaches the es object to the R workspace (to use the posteriors for the economic analysis)
 attach.bugs(es)

@@ -1,0 +1,15 @@
+{
+    "save_workspace": "never",
+    "always_save_history": false,
+    "reuse_sessions_for_project_links": true,
+    "posix_terminal_shell": "bash",
+    "rmd_viewer_type": "pane",
+    "default_sweave_engine": "knitr",
+    "jobs_tab_visibility": "shown",
+# This line instructs Rstudio to make ~/practical the working directory
+# which means here::here() would point to it - and the path to the 
+# model codes/data should be modified accordingly
+    "initial_working_directory": "~/practical",
+    "visual_markdown_editing_show_doc_outline": false,
+    "latex_preview_on_cursor_idle": "never"
+}

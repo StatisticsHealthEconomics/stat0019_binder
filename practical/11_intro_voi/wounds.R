@@ -19,8 +19,8 @@ costs[,2]<- p2*par$Cwi+(1-p2)*par$Cnwi + par$Cdrug
 
 ### EVPI in BCEA ###
 
-bcea.out <- bcea (e=effects, c=costs, ref=2, wtp=seq(1000,40000, 1000), 
-interventions=c("no antibiotics", "antibiotics"),plot=F)
+bcea.out <- bcea (eff=effects, cost=costs, ref=2, wtp=seq(1000,40000, 1000), 
+                  interventions=c("no antibiotics", "antibiotics"),plot=F)
 summary(bcea.out)
 
 bcea.out$eib[20]
@@ -62,7 +62,7 @@ probCE
 #Running mean to assess convergence
 PopEVPI.run<-c(rep(0,150))
 for (i in 1:150){
-	PopEVPI.run[i]<-166081*7.7217*mean(max.NBgain[1:(i*1000)])
+  PopEVPI.run[i]<-166081*7.7217*mean(max.NBgain[1:(i*1000)])
 }
 
 #Convergence check plot

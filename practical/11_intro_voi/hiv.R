@@ -32,7 +32,7 @@ EVPI
 #Running mean to assess convergence
 EVPI.run<-c(rep(0,150))
 for (i in 1:150){
-	EVPI.run[i]<-7.7217*mean(max.NBgain[1:(i*1000)])
+  EVPI.run[i]<-7.7217*mean(max.NBgain[1:(i*1000)])
 }
 
 #Convergence check plot
@@ -49,15 +49,12 @@ costs<-matrix(rep(0,Nsim*Nt),Nsim,Nt)
 effects[,2]<-N*(1-par$a-par$b)*(par$M*par$e*(1-par$h))
 costs[,2]<-N*(1-par$a-par$b)*(T*(1-par$e*par$h))
 
-bcea.out <- bcea (e=effects, c=costs, ref=2, wtp=1, 
-interventions=c("targetted", "universal"),plot=F)
+bcea.out <- bcea (eff=effects, cost=costs, ref=2, wtp=1, 
+                  interventions=c("targetted", "universal"),plot=F)
 summary(bcea.out)
 
 EVPI.bcea<- bcea.out$evi*7.7217
 
 EVPI.bcea
-
-
-
 
 
