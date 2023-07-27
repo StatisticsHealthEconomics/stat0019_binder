@@ -61,7 +61,7 @@ data <- list(S=S,H=H,r0=r0,r1=r1,n0=n0,n1=n1,x=x,m=m,mu.inf=mu.inf,tau.inf=tau.i
              mean.mu.gamma=mean.mu.gamma,prec.mu.gamma=prec.mu.gamma)
 
 # Points to the txt file where the OpenBUGS model is saved
-filein <- here::here("practical","05_ald","EvSynth.txt")
+filein <- here::here("05_ald","EvSynth.txt")
 
 # Defines the parameters list
 params <- c("p1","p2","rho","l","c.inf","alpha","delta","gamma")

@@ -1,5 +1,5 @@
 # Uses the package 'here' to set the working directory to the correct one
-setwd(here::here("practical","02_mcmc"))
+setwd(here::here("02_mcmc"))
 
 # Alternatively, you can do this by going on the bottom-right panel, selecting 
 # the tab "Files" (which is the default/first one), then navigate to "practicals", 
@@ -35,7 +35,7 @@ model = bugs(
   inits=NULL,
   # The model file is define externally - using here::here ensures that we 
   # pick the correct full path to the model file
-  model.file=here::here("practical","02_mcmc","drug-MCMC.txt"),
+  model.file=here::here("02_mcmc","drug-MCMC.txt"),
   n.chains=2,
   n.iter=5000,
   n.burnin=0,

@@ -3,14 +3,14 @@ library(BCEA)
 library(R2OpenBUGS)
 
 # Loads the data list
-data=readRDS(here::here("practical","10_missing","missing_data.rds"))
+data=readRDS(here::here("10_missing","missing_data.rds"))
 # Inspect the relevant data --- for example by producing a histogram of the costs in the control arm (t=1)
 hist(data$c[[1]])
 
 # Run the Bivariate Normal model
 # Defines: 
 # 1. model file
-filein=here::here("practical","10_missing","Normal_Normal.txt")
+filein=here::here("10_missing","Normal_Normal.txt")
 
 # 2. data list
 datalist=list(N1=data$n[[1]],eff1=data$e[[1]],cost1=data$c[[1]],u1=data$u[[1]],
@@ -51,7 +51,7 @@ sum(NN$sims.list$eff1[,1]>1)/NN$n.sims
 #     The syntax of the model and the R script is effectively identical
 
 # 1. model file
-filein=here::here("practical","10_missing","Beta_Gamma.txt")
+filein=here::here("10_missing","Beta_Gamma.txt")
 
 # 2. data list
 datalist=list(N1=data$n[[1]],eff1=data$e[[1]],cost1=data$c[[1]],u1=data$u[[1]],

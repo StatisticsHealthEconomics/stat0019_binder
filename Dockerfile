@@ -19,5 +19,9 @@ RUN echo "Checking for 'apt.txt'..." \
         ; fi
 USER ${NB_USER}
 
+## Copies the Rstudio configuration file
+## Among other things, this tells the container to open Rstudio in ~/practical
+COPY rstudio-prefs.json .config/rstudio/rstudio-prefs.json
+
 ## Run an install.R script, if it exists.
 RUN if [ -f install.R ]; then R --quiet -f install.R; fi

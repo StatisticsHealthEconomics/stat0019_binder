@@ -1,5 +1,5 @@
 # Uses the package 'here' to set the working directory to the correct one
-setwd(here::here("practical","02_mcmc"))
+setwd(here::here("02_mcmc"))
 
 # Alternatively, you can do this by going on the bottom-right panel, selecting 
 # the tab "Files" (which is the default/first one), then navigate to "practicals", 

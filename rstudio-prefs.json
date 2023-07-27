@@ -6,10 +6,7 @@
     "rmd_viewer_type": "pane",
     "default_sweave_engine": "knitr",
     "jobs_tab_visibility": "shown",
-# This line instructs Rstudio to make ~/practical the working directory
-# which means here::here() would point to it - and the path to the 
-# model codes/data should be modified accordingly
-    "initial_working_directory": "~/practical",
+    "initial_working_directory": "/home/rstudio//practical/",
     "visual_markdown_editing_show_doc_outline": false,
     "latex_preview_on_cursor_idle": "never"
 }

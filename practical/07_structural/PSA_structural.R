@@ -4,13 +4,13 @@ library(R2OpenBUGS)
 
 # 1. Loads the results of the Bayesian model performed for the 6 statins. 
 # NB this contains variables effect and cost.tot that can be used to perform the  economic analysis using BCEA
-load(here::here("practical","07_structural","statins_base.Rdata"))
+load(here::here("07_structural","statins_base.Rdata"))
 
 # Now loads the results of a new Bayesian model performed for the 6 statins
 # In this case, one of the priors has been modified to consider a more robust alternative
 # (in particular that's a Half-Cauchy --- instead of a Normal --- model for the 
 # statin-specific effectiveness)
-load(here::here("practical","07_structural","statins_HC.Rdata"))
+load(here::here("07_structural","statins_HC.Rdata"))
 
 # 2. Now uses BCEA to perform the two economic analyses
 interventions <- c("Atorvastatin","Fluvastatin","Lovastatin","Pravastatin",

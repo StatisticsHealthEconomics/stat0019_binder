@@ -1,7 +1,7 @@
 library(BCEA)
 library(mgcv)
 
-setwd(here::here("practical","12_evppi"))
+setwd(here::here("12_evppi"))
 
 ## Load the data from our model
 psa <- read.csv("psa_model_1.csv")

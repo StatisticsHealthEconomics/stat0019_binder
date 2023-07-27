@@ -2,7 +2,7 @@
 library(bmhe)
 
 # Loads data list
-load(here::here("practical","06_nma","smoke.Rdata"))
+load(here::here("06_nma","smoke.Rdata"))
 # Treatment names
 tnames <- c("A: None","B: Self-help","C: Individual","D: Group")
 
@@ -17,7 +17,7 @@ dc[dc=="NA/NA"] <- ""
 inits <- list(list(mu=rep(0,24), d=c(NA,0,0,0)),
               list(mu=rep(-1,24), d=c(NA,1,1,1)))
 res <- bugs(
-  model=here::here("practical","06_nma","smokefix_model.txt"), 
+  model=here::here("06_nma","smokefix_model.txt"), 
   data=smoke.list, inits=inits,
   parameters=c("d","or","L","pq"),
   n.chains=2, n.burnin=1000, n.iter=20000
@@ -39,7 +39,7 @@ inits <- list(list(mu=rep(0,24), d=c(NA,0,0,0), sd=1),
              list(mu=rep(-1,24), d=c(NA,1,1,1), sd=2))
 
 res2 <- bugs(
-  model=here::here("practical","06_nma","smokere_model.txt"), 
+  model=here::here("06_nma","smokere_model.txt"), 
   data=smoke.list, inits=inits,
   parameters=c("or", "d", "sd", "pq", "L"),
   n.chains=2, n.burnin=1000, n.iter=20000

@@ -3,7 +3,7 @@ library(R2OpenBUGS)
 
 ### Exercise 1.
 # Loads the data on costs only into R from the txt file (list originally prepared for BUGS)
-cost.data=source(here::here("practical","04_ild","cost-data.txt"))$value
+cost.data=source(here::here("04_ild","cost-data.txt"))$value
 # Can inspect the resulting object
 names(cost.data)
 # NB: 'cost.data' is an object containing different variables so need to use the '$' notation to access them!
@@ -11,7 +11,7 @@ head(cost.data$cost1)		# This for example shows the first 6 values of the variab
 							
 # Runs the BUGS model from R
 # Specifies the path to the model file - uses 'here::here' to make sure we get the correct file
-model.file=here::here("practical","04_ild","normal-mod.txt")				
+model.file=here::here("04_ild","normal-mod.txt")				
 
 # Defines the list of parameters
 params <- c("mu","ss","ls","delta.c","dev","total.dev")	
@@ -65,15 +65,15 @@ sum(delta.c>0)/m$n.sims
 ## Exercise 3.
 # Now loads the data for costs & utilities into R from the txt file (list originally prepared for BUGS)
 cost.utility=source(
-  here::here("practical","04_ild","cost-util-data.txt")
+  here::here("04_ild","cost-util-data.txt")
 )$value		
 # Specifies the new file with the cost-effectiveness model
-model.file=here::here("practical","04_ild","cgeg-mod.txt")				
+model.file=here::here("04_ild","cgeg-mod.txt")				
 
 # Loads the initial values for the three chains
-inits1=source(here::here("practical","04_ild","cgeg-inits1.txt"))$value
-inits2=source(here::here("practical","04_ild","cgeg-inits2.txt"))$value
-inits3=source(here::here("practical","04_ild","cgeg-inits3.txt"))$value
+inits1=source(here::here("04_ild","cgeg-inits1.txt"))$value
+inits2=source(here::here("04_ild","cgeg-inits2.txt"))$value
+inits3=source(here::here("04_ild","cgeg-inits3.txt"))$value
 
 # Combines them into a single list --- can be lazy and only use 2...
 inits=list(inits1,inits2,inits3)			

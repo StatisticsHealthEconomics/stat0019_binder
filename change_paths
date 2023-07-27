@@ -1,0 +1,6 @@
+# This will change the path in the 'here::here(' instruction in *all* files under
+# the 'practical' folder
+grep -rl 'here("practical",' practical/ | xargs sed -i 's/here("practical",/here(/g'
+
+# Then can use the file 'rstudio-prefs.json' to tell the docker container to point to
+# '~/practical' as the working directory (which is more straightforward for the user)

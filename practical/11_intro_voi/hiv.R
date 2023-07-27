@@ -1,6 +1,6 @@
 library(BCEA)
 
-setwd(here::here("practical","11_intro_voi"))
+setwd(here::here("11_intro_voi"))
 
 #Read in 150,000 simulated values of M, a, b, e, h
 par<-read.table("hiv150.txt",header=TRUE)
