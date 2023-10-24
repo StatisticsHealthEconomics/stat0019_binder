@@ -1,6 +1,8 @@
+options(timeout=600)
 install.packages("tidyverse")
 install.packages("here")
 install.packages("rmarkdown")
+install.packages("remotes")
 install.packages('BCEA')
 install.packages('rjags')
 install.packages("R2OpenBUGS")

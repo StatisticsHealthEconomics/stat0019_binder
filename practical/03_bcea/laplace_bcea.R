@@ -11,7 +11,7 @@ data$y
 # Runs the model
 # Use 'here::here' to make sure the correct path is specified to get the model
 # code file
-filein=here::here("practical","03_bcea","ModelLaplace.txt")
+filein=here::here("03_bcea","ModelLaplace.txt")
 params="theta"
 # Two versions of the initial values --- one is deterministic, the other is random
 inits_det=list(list(theta=.1),list(theta=.9))
@@ -39,7 +39,7 @@ hist(theta)
 # Loads the data and shows what's inside the object - again using 
 # 'here::here' to ensure we get the correct full path to the file, 
 # irrespective of what the current working directory is
-load(here::here("practical","03_bcea","Vaccine.RData"))
+load(here::here("03_bcea","Vaccine.RData"))
 names(he)
 
 # Uses BCEA to post-process the object

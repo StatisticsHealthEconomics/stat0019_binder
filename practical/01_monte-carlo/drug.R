@@ -1,7 +1,7 @@
 # This files essentially does the same analysis as OpenBUGS
 
 # Uses the package 'here' to set the working directory to the correct one
-setwd(here::here("practical","01_monte-carlo"))
+setwd(here::here("01_monte-carlo"))
 
 # Alternatively, you can do this by going on the bottom-right panel, selecting 
 # the tab "Files" (which is the default/first one), then navigate to "practicals", 

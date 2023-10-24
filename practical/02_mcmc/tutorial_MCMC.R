@@ -2,7 +2,7 @@
 # the parameters of a semi-conjugated mode, as shown in the lecture
 
 # Can also change working directory with
-# here::here("practical","02_mcmc")
+# here::here("02_mcmc")
 # but it's not strictly necessary here, because we're not using any external
 # file and all the variables are defined below, locally...
 

@@ -3,7 +3,7 @@ library(BCEA)
 
 ### Smoking cessation network meta-analysis data in format obtained
 ### from Lu & Ades tutorial "Introduction to Mixed Treatment Comparisons"
-load(here::here("practical","06_nma","smoke.Rdata"))
+load(here::here("06_nma","smoke.Rdata"))
 
 ### Explores the data object just loaded
 names(smoke.list)
@@ -18,7 +18,7 @@ inits <- list(list(mu=rep(0,24), d=c(NA,0,0,0)),
 
 ### Pilot run with no burn-in, to illustrate convergence using traceplots
 res <- bugs(
-  model=here::here("practical","06_nma","smokefix_model.txt"), 
+  model=here::here("06_nma","smokefix_model.txt"), 
   data=smoke.list, inits=inits,
   parameters=c("d"),
   n.chains=2, n.burnin=0, n.iter=10000
@@ -38,7 +38,7 @@ bmhe::traceplot(res,"d")
 # In Rstudio do par(mfrow=c(1,1)) to "reset" the graphical interface
 ## It's certainly converged by 1000, so no need for any more fancy diagnostics
 res <- bugs(
-  model=here::here("practical","06_nma","smokefix_model.txt"), 
+  model=here::here("06_nma","smokefix_model.txt"), 
   data=smoke.list, inits=inits,
   parameters=c("d","L","pq"),
   n.chains=2, n.burnin=1000, n.iter=5000
@@ -55,7 +55,7 @@ inits <- list(list(mu=rep(0,24), d=c(NA,0,0,0), sd=1),
               list(mu=rep(-1,24), d=c(NA,1,1,1), sd=2))
 
 res2 <- bugs(
-  model=here::here("practical","06_nma","smokere_model.txt"), 
+  model=here::here("06_nma","smokere_model.txt"), 
   data=smoke.list, inits=inits,
   parameters=c("or", "d", "sd", "pq", "L"),
   n.chains=2, n.burnin=1000, n.iter=20000
@@ -82,7 +82,7 @@ plot(m)
 
 ### Appendix: Original pre-processing of dataset to format the data in a suitable way
 smoke <- read.table(
-  here::here("practical","06_nma","smoke_data_orig.txt"), 
+  here::here("06_nma","smoke_data_orig.txt"), 
   header=TRUE, nrow=24
 )
 names(smoke) <- gsub("\\.", "", names(smoke))
