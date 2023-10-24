@@ -1,8 +1,9 @@
-FROM rocker/binder:4.1.2
+FROM rocker/binder:latest
 
 ## Declares build arguments
 ARG NB_USER
 ARG NB_UID
+ARG git_personal_token
 
 COPY --chown=${NB_USER} . ${HOME}
 
