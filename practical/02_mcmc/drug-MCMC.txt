@@ -1,1 +1,1 @@
-model {   theta    ~ dbeta(a,b)         # prior distribution   y        ~ dbin(theta,m)      # sampling distribution   y.pred   ~ dbin(theta,n)      # predictive distribution   P.crit  <- step(y.pred - ncrit + 0.5) # =1 if y.pred >= ncrit,}
+model {   theta    ~ dbeta(a,b)         # prior distribution   y        ~ dbin(theta,m)      # sampling distribution   y.pred   ~ dbin(theta,n)      # predictive distribution   P.crit  <- step(y.pred - ncrit + 0.5) # =1 if y.pred >= ncrit}

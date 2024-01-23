@@ -92,3 +92,51 @@ B=nsims*var(mu.hat)
 # Now can compute (approximated) PSR (Rhat) and neff
 Rhat_approx=sqrt( (1/W) * ( ((nsims-1)/nsims) * W + ((nchains+1)/(nsims*nchains)) * B ))
 neff=nchains * nsims * min((1/B)*((nsims-1)/nsims) * W + (1/nsims) * B, 1)
+
+
+# NB: If you like, you can use jags, rather than BUGS. 
+# The process is *almost* identical... 
+#
+# First, load the package 'R2jags' (instead of 'R2OpenBUGS')
+library(R2jags)
+#
+# In the Binder VM, this is already installed, so you are good to go.
+# If you're doing this on your own machine, you must install first
+# jags and then in R run the following command:
+# install.packages("R2jags")
+#
+# Then substitute the command bugs(...) with the command jags(...), like this
+model2 = jags(
+  data=data,
+  parameters.to.save=c("y.pred","theta","P.crit"),
+  inits=NULL,
+  # The model file is define externally - using here::here ensures that we 
+  # pick the correct full path to the model file
+  model.file=here::here("02_mcmc","drug-MCMC.txt"),
+  n.chains=2,
+  n.iter=5000,
+  n.burnin=0,
+  DIC=TRUE
+)
+#
+# (I'm saving the output as 'model2' as I want to compare with the BUGS
+# output. The name is irrelevant and you could choose whatever you want...).
+#
+# Notice that the two objects 'model' (saved by BUGS) and 'model2' (saved by jags)
+# are *very* similar, but not identical...
+#
+# These commands show what's inside each of the two model outputs
+names(model)
+names(model2)
+#
+# As you can see, these are slightly different. Jags stores the results generated
+# by running the MCMC algorithm in a sub-object, called 'BUGSoutput'. 
+# So if you want to access the variables stored in there, you need to do it
+# slightly differently than shown above for BUGS. So instead of 
+acf(model$sims.list$theta,lwd=4,main="theta",col="red")
+# 
+# you need to call the slightly revised command
+acf(model2$BUGSoutput$sims.list$theta,lwd=4,main="theta",col="red")
+#
+# See also https://egon.stats.ucl.ac.uk/static/stat0019/practical/02_mcmc/bugs-vs-jags.html
+# for more (minor) differences between BUGS and jags
