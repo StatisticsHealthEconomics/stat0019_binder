@@ -1,0 +1,12 @@
+docker run --rm -it -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v  ./practical:/home/rstudio/practical stat0019 bash
+
+# run --rm: removes the container when it's closed
+# -it: makes the session interactive
+# -e DISPLAY=$DISPLAY: makes the local display device (typically :0) available to the docker container
+# -v /tmp/.X11-unix:/tmp/.X11-unix: adds the volume /tmp/.X11-unix from the local machine to the volume /tmp/.X11-unix in the docker
+#                                   (this ensures that X applications such as graphs from R can be opened from the container)
+# -v /home/gianluca:/home/rstudio/gianluca: adds the volume /home/gianluca from the local machine to the volume 
+#                                           /home/rstudio/gianluca in the docker container, so that the local files can be used on the 
+#                                           container and changed saved and made permanent
+# r-4.2.1: name of the image to run in the container
+# bash: run the container in a bash shell (terminal)

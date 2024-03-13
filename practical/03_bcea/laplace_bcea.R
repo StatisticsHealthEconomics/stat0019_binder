@@ -8,15 +8,16 @@ data=list(y=y,n=n)
 names(data)
 data$y
 
-# Runs the model
-# Use 'here::here' to make sure the correct path is specified to get the model
-# code file
+#' Runs the model
+#' Use 'here::here' to make sure the correct path is specified to get the model
+#' code file
 filein=here::here("03_bcea","ModelLaplace.txt")
 params="theta"
-# Two versions of the initial values --- one is deterministic, the other is random
+#' Two versions of the initial values: one is deterministic, the other is random
 inits_det=list(list(theta=.1),list(theta=.9))
 inits_ran=function(){list(theta=runif(1))}
 
+# Running the model using OpenBUGS and R2OpenBUGS
 library(R2OpenBUGS)
 model= bugs(data=data,inits=inits_det,parameters.to.save=params,
             model.file=filein,n.chains=2,n.iter=10000,
@@ -30,6 +31,26 @@ print(model,digits=3)
 
 # Makes *all* of the BUGS model output available to the main R workspace
 attach.bugs(model)
+
+###############################################################################
+#' You can also use JAGS and R2jags (assuming you have installed that too)...
+#' The code is basically the same, but with only minor changes
+library(R2jags)
+model= jags(data=data,inits=inits_det,parameters.to.save=params,
+            model.file=filein,n.chains=2,n.iter=10000,
+            n.burnin=4500,n.thin=1,DIC=TRUE) 
+
+#' Inspect the outcome of the BUGS model, which, **when using JAGS**, are 
+#' stored in a different place -- basically, R2jags creates a "sub-folder", 
+#' ('$BUGSoutput') in which it stores all the BUGS output.  
+names(model)
+model$BUGSoutput$n.iter
+
+print(model,digits=3)
+
+# Makes *all* of the BUGS model output available to the main R workspace
+attach.jags(model)
+###############################################################################
 
 # Visual representation of the output
 hist(theta)

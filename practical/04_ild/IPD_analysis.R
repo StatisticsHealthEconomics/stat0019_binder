@@ -1,4 +1,15 @@
-# Loads the R2OpenBUGS package to connect R to OpenBUGS
+#' Loads the `R2OpenBUGS` package to connect `R` to `OpenBUGS`
+#' 
+#' NB: Of course, if you need/want to, you can use `JAGS` and `R2jags` to run the 
+#' model here. In that case, remember the following:
+#' 1. Use `library(R2jags)`
+#' 2. Run the function `jags` instead of `bugs` to actually call the programme
+#'    to run the MCMC simulations
+#' 3. When using `R2jags`, the output from the MCMC process is stored in a 
+#'    sub-object. So if you run `m=jags(...)`, the output of the simulation
+#'    is stored in `m$BUGSoutput`. `R2OpenBUGS` doesn't do that and stores all
+#'    the output under `m$`.
+#'    
 library(R2OpenBUGS)
 
 ### Exercise 1.
