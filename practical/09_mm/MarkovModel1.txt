@@ -10,7 +10,7 @@ model {
 	}
 	# Prior for the non-observed state (Hex)
 	lambda.0[4,1:S] ~ ddirch(alpha.0[1:S])
-	lambda.1[4,1:S] ~ ddirch(alpha.0[1:S])  
+	lambda.1[4,1:S] ~ ddirch(alpha.1[1:S])  
 	# Deterministic values for the absorbent state (TP)
 	for (s in 1:4) {
 		lambda.0[S,s] <- 0
