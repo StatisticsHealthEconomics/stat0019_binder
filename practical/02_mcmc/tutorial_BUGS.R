@@ -91,7 +91,7 @@ B=nsims*var(mu.hat)
 
 # Now can compute (approximated) PSR (Rhat) and neff
 Rhat_approx=sqrt( (1/W) * ( ((nsims-1)/nsims) * W + ((nchains+1)/(nsims*nchains)) * B ))
-neff=nchains * nsims * min((1/B)*((nsims-1)/nsims) * W + (1/nsims) * B, 1)
+neff=nchains * nsims * min((1/B)*(((nsims-1)/nsims) * W + B/nsims), 1)
 
 
 # NB: If you like, you can use jags, rather than BUGS. 
