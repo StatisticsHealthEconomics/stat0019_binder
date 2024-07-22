@@ -1,6 +1,8 @@
 # Asthma cost-effectiveness analysis based on a Markov model
 # source: Price & Briggs (2002); BMHE (5.4)
 
+setwd(here::here("11_mm"))
+
 # Load all the relevant data
 S <- 5			# number of clinical states
 			# s=1: STW

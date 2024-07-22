@@ -5,7 +5,7 @@
 library(dplyr)
 
 # Set the working directory, for example something like 
-setwd(here::here("09_mm"))
+setwd(here::here("11_mm"))
 
 # Now loads the data. Notice the 'pipe' operator '%>%' (https://cran.r-project.org/web/packages/magrittr/vignettes/magrittr.html) 
 data=read.table("data.txt",header=T,sep="\t") %>% 
