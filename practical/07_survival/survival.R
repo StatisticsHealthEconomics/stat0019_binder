@@ -40,7 +40,7 @@ print(m2,2)   # Then the output for the Weibull model (the second element of 'mo
 
 ## NB: the model has been run on a more powerful (local) machine and the output is
 ##     saved in the object 'm3_HMC.rds', so you can still use it in the Binder too!
-m3=readRDS(here::here("08_survival","m3_HMC.rds"))
+m3=readRDS(here::here("07_survival","m3_HMC.rds"))
 print(m3)     # First print the summary for the Exponential model (the first in 'mods')
 print(m3,2)   # Then the output for the Weibull model (the second element of 'mods')
 
