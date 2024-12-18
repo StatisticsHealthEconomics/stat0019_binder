@@ -75,7 +75,7 @@ print(mm1,digits=3,intervals=c(0.025, 0.975))
 
 attach.jags(mm1)
  
-#' ## Alternatively, could use JAGS --- code basically identical
+#' ## Alternatively, could use BUGS --- code basically identical
 # library(R2OpenBUGS)
 # dataBugs <- list("n.0","n.1","r.0","r.1","alpha.0","alpha.1","S")
 # filein <- here::here("08_mm","MarkovModel1.txt")
