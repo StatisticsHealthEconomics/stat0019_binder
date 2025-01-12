@@ -1,4 +1,4 @@
-options(timeout=1600)
+options(timeout=2600)
 install.packages("tidyverse")
 install.packages("here")
 install.packages("rmarkdown")
