@@ -26,3 +26,4 @@ COPY rstudio-prefs.json .config/rstudio/rstudio-prefs.json
 
 ## Run an install.R script, if it exists.
 RUN if [ -f install.R ]; then R --quiet -f install.R; fi
+
