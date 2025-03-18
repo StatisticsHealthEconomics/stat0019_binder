@@ -9,7 +9,7 @@ install.packages("R2OpenBUGS")
 install.packages("R2jags")
 install.packages("bmhe", repos = c("https://giabaio.r-universe.dev", "https://cloud.r-project.org"))
 install.packages("survHE")
-install.packages("INLA",repos=c(getOption("repos"),INLA="https://inla.r-inla-download.org/R/testing"), dep=TRUE) 
+install.packages("INLA",repos=c("https://cloud.r-project.org",INLA="https://inla.r-inla-download.org/R/testing"), dep=TRUE) 
 # Needs the R-forge version of MatrixModels or else INLA will break
 install.packages("MatrixModels",repos="https://r-forge.r-project.org/")
 install.packages("survHEinla", repos = c("https://giabaio.r-universe.dev", "https://cloud.r-project.org"))
