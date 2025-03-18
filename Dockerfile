@@ -18,6 +18,7 @@ RUN echo "Checking for 'apt.txt'..." \
         rm -rf /var/lib/apt/lists/* && \
         dpkg  -i openbugs_3.2.2-1_amd64.deb && rm openbugs_3.2.2-1_amd64.deb \
         ; fi
+RUN if [ -f install.R ]; then R --quiet -f install.R; fi
 USER ${NB_USER}
 
 ## Copies the Rstudio configuration file
@@ -25,5 +26,5 @@ USER ${NB_USER}
 COPY rstudio-prefs.json .config/rstudio/rstudio-prefs.json
 
 ## Run an install.R script, if it exists.
-RUN if [ -f install.R ]; then R --quiet -f install.R; fi
+## RUN if [ -f install.R ]; then R --quiet -f install.R; fi
 
