@@ -157,6 +157,7 @@ for (i in 1:n.sims) {
 #' First gets the aggregated data from the simulations and then 
 #' wrangles the resulting dataset to a long format. This plot is often 
 #' termed a "Markov trace"
+library(tidyverse)
 apply(m.0,c(2,3),sum) |> t() |> as_tibble() |>  
   setNames(c("STW","UTW","Pex","Hex","TF")) |> 
   mutate(Intervention="FP",time=seq(0,12)) |> 
@@ -184,7 +185,7 @@ apply(m.0,c(2,3),sum) |> t() |> as_tibble() |>
 
 
 #' Now runs the economic analysis
-#' Defines the costs
+#' Defines the costs --- see BMHE page 193
 unit.cost.0 <- c(2.38,2.38,1815.58,95.21)
 unit.cost.1 <- c(7.96,7.96,1821.17,100.79)
 
