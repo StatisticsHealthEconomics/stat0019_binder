@@ -1,15 +1,11 @@
-# Solution to exercise 3
-# Change both calls to transform() (one on plaque_psoriasis_ipd
-# and the other on plaque_psoriasis_agd) so that "UST" is included
-# in the same class as c("IXE_Q2W", "IXE_Q4W", "SEC_150", "SEC_300")
-# and relabel this class to  "IL-17 or IL-12/23 blocker"
-# Run relative_effects() again.
-# Effects of UST vs. IXE_Q2W don't change (both about -0.91) as
-# they are in the same class and the effect is 'common'
-# Effects of UST vs. ETN change (0.45 in CLEAR and 0.47 in ERASURE) as they are still in different classes.
+# Solution to Exercise 1
+# Remove weight from regression from nma()
+# Remove weight from add_integration()
+# Replace prospect_dat with tlv_dat taken from the exercise table
+# Run relative_effects on tlv_dat
+# IXE_Q2W remains the treatment with greatest probit difference to placebo.
 
-
-setwd(here::here("08_mlnmr"))
+setwd(here::here("09_mlnmr"))
 
 
 library(multinma)
@@ -31,8 +27,9 @@ pso_ipd <- transform(plaque_psoriasis_ipd,
                      # Treatment classes
                      trtclass = 
                        ifelse(trtc == "PBO", "Placebo",
-                              ifelse(trtc %in% c("IXE_Q2W", "IXE_Q4W", "SEC_150", "SEC_300", "UST"),  "IL-17 or IL-12/23 blocker",
-                                     ifelse(trtc == "ETN", "TNFa blocker", NA))),
+                              ifelse(trtc %in% c("IXE_Q2W", "IXE_Q4W", "SEC_150", "SEC_300"),  "IL-17 blocker",
+                                     ifelse(trtc == "ETN", "TNFa blocker",
+                                            ifelse(trtc == "UST", "IL-12/23 blocker", NA)))),
                      # Check complete cases for covariates of interest
                      is_complete = complete.cases(durnpso, prevsys, bsa, weight, psa)
 ) 
@@ -51,8 +48,9 @@ pso_agd <- transform(plaque_psoriasis_agd,
                      # Treatment classes
                      trtclass = 
                        ifelse(trtc == "PBO", "Placebo",
-                              ifelse(trtc %in% c("IXE_Q2W", "IXE_Q4W", "SEC_150", "SEC_300", "UST"),  "IL-17 or IL-12/23 blocker",
-                                     ifelse(trtc == "ETN", "TNFa blocker", NA)))
+                              ifelse(trtc %in% c("IXE_Q2W", "IXE_Q4W", "SEC_150", "SEC_300"),  "IL-17 blocker",
+                                     ifelse(trtc == "ETN", "TNFa blocker",
+                                            ifelse(trtc == "UST", "IL-12/23 blocker", NA))))
 )
 
 # Create a combined evidence network
@@ -75,7 +73,6 @@ pso_net <- add_integration(pso_net,
                            durnpso = distr(qgamma, mean = durnpso_mean, sd = durnpso_sd),
                            prevsys = distr(qbern, prob = prevsys),
                            bsa = distr(qlogitnorm, mean = bsa_mean, sd = bsa_sd),
-                           weight = distr(qgamma, mean = weight_mean, sd = weight_sd),
                            psa = distr(qbern, prob = psa))
 
 # Run the multinma 
@@ -84,7 +81,7 @@ pso_fit_FE <- nma(pso_net,
                   link = "probit", 
                   likelihood = "bernoulli2",
                   # Specify the regression model applied to IPD and AgD
-                  regression = ~(durnpso + prevsys + bsa + weight + psa)*.trt,
+                  regression = ~(durnpso + prevsys + bsa + psa)*.trt,
                   class_interactions = "common",
                   prior_intercept = normal(scale = 10),
                   prior_trt = normal(scale = 10),
@@ -94,5 +91,19 @@ pso_fit_FE <- nma(pso_net,
                   QR = TRUE)
 
 
-# Population-average conditional effects
-relative_effects(pso_fit_FE, all_contrasts = TRUE)                 
+
+# Basic parameter summaries
+print(pso_fit_FE, pars = "d")
+
+# Relative effects in the PROSPECT study population
+# Specify the characteristics of this population
+tlv_dat <- data.frame(
+  studyc = "PROSPECT",
+  durnpso = 18.6 / 10, durnpso_sd = 8.5 / 10,
+  prevsys = 0.802,
+  bsa = 17.5 / 100, bsa_sd = 12.4 / 100,
+  psa = 0.181)
+
+# Then estimate relative treatment effects in that population
+relative_effects(pso_fit_FE, newdata = tlv_dat, 
+                 study = studyc, all_contrasts = FALSE)

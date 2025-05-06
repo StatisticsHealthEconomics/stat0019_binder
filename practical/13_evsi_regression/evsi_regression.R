@@ -2,7 +2,7 @@
 library(mgcv)
 
 ## Set the working directory
-setwd(here::here("15_evsi_regression"))
+setwd(here::here("13_evsi_regression"))
 # This needs to be changed to your working directory on your own computer
 
 ## Load the data

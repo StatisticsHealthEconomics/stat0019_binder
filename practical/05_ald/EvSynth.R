@@ -15,10 +15,10 @@ n1 <- c(553,414,144,268,252,493)
 S <- length(r0)				# number of relevant studies
 
 #' Evidence synthesis on incidence of influenza in healthy adults (under t=0)
-x <- m <- numeric()			# defines observed values for baseline risk
-x <- c(0,6,5,6,25,18,14,3,27)
+y <- m <- numeric()			# defines observed values for baseline risk
+y <- c(0,6,5,6,25,18,14,3,27)
 m <- c(23,241,159,137,519,298,137,24,132)
-H <- length(x)
+H <- length(y)
 
 #' Data on costs
 unit.cost.drug <- 2.4		# unit (daily) cost of NI
@@ -27,52 +27,34 @@ c.gp <- 19			# cost of GP visit to administer prophylactic NI
 vat <- 1.175			# VAT
 c.ni <- unit.cost.drug*length.treat*vat 
 
-#' Informative prior on cost of influenza 
+# Informative prior on cost of influenza 
 mu.inf <- 16.78			# mean cost of influenza episode
 sigma.inf <- 2.34		# sd cost of influenza episode
 tau.inf <- 1/sigma.inf^2	# precision cost of influenza episode
 
-#' Informative prior on length of influenza episodes
-#' Compute the value of parameters (mulog,sigmalog) for a logNormal 
-#' distribution to have mean and sd (m,s) - check `help(lognPar)`
-m.l <- 8.2			                      		  # original value in the paper: 8.2
-s.l <- sqrt(2)					                    # original value in the paper: sqrt(2)
-mu.l <- bmhe::lognPar(m.l,s.l)$mulog			  # mean time to recovery (log scale)
-sigma.l <- bmhe::lognPar(m.l,s.l)$sigmalog	# sd time to recovery (log scale)
-tau.l <- 1/sigma.l^2				                # precision time to recovery (log scale)
+# Informative prior on length of influenza episodes
+# Compute the value of parameters (mulog,sigmalog) for a logNormal 
+# distribution to have mean and sd (m,s) - check help(lognPar)
+m.l=bmhe::lognPar(8.2,2)$mulog          # original value in the paper: 8.2
+s.l=bmhe::lognPar(8.2,2)$sigmalog       # original value in the paper: sqrt(2)
 
-#' Parameters of unstructured effects
-mean.alpha <- 0
-sd.alpha <- sqrt(10)
-prec.alpha <- 1/sd.alpha^2
-mean.mu.delta <- 0
-sd.mu.delta <- sqrt(10)
-prec.mu.delta <- 1/sd.mu.delta^2
-mean.mu.gamma <- 0
-sd.mu.gamma <- 1000
-prec.mu.gamma <- 1/sd.mu.gamma^2
-
-
-#' Prepares to launch `OpenBUGS`
-library(R2OpenBUGS)
+#' Prepares to launch `JAGS`
+library(R2jags)
 
 #' Creates the data list
-data <- list(S=S,H=H,r0=r0,r1=r1,n0=n0,n1=n1,x=x,m=m,mu.inf=mu.inf,tau.inf=tau.inf,
-             mu.l=mu.l,tau.l=tau.l,mean.alpha=mean.alpha,prec.alpha=prec.alpha,
-             mean.mu.delta=mean.mu.delta,prec.mu.delta=prec.mu.delta,
-             mean.mu.gamma=mean.mu.gamma,prec.mu.gamma=prec.mu.gamma)
+data <- list(
+  S=S,H=H,r0=r0,r1=r1,n0=n0,n1=n1,y=y,m=m
+)
 
 #' Points to the txt file where the OpenBUGS model is saved
 filein <- here::here("05_ald","EvSynth.txt")
 
 #' Defines the parameters list
-params <- c("p1","p2","rho","l","c.inf","alpha","delta","gamma")
+params <- c("p0","p1","or","l","c.inf")
 
 # Creates a function to draw random initial values 
-inits <- function(){
-	list(alpha=rnorm(S,0,1),delta=rnorm(S,0,1),mu.delta=rnorm(1),
-       sigma.delta=runif(1),gamma=rnorm(H,0,1),mu.gamma=rnorm(1),
-       sigma.gamma=runif(1),c.inf=rnorm(1))
+inits=function(){
+  list(alpha=rnorm(data$S,0,.5),delta=rnorm(data$S,0,.5))
 }
 
 #' Sets the number of iterations, burnin and thinning
@@ -80,42 +62,61 @@ n.iter <- 10000
 n.burnin <- 9500
 n.thin <- 2
 
-#' Finally calls OpenBUGS to do the MCMC run and saves results to the object "es"
-es <- bugs(data=data,inits=inits,parameters.to.save=params,model.file=filein,
-	n.chains=2, n.iter, n.burnin, n.thin, DIC=TRUE)
+#' Finally calls JAGS to do the MCMC run and saves results to the object "es"
+es=jags(
+  data=data,
+  parameters.to.save=params,
+  inits=inits,n.chains=2,n.iter=25000,n.burnin=5000,n.thin=10,DIC=TRUE,pD=TRUE,
+  model.file=filein
+)
 
 #' Displays the summary statistics
 print(es,digits=3,intervals=c(0.025, 0.975))
 
 #' Convergence check through traceplots (example for node p1)
-plot(es$sims.list$p1[1:500],t="l",col="blue",ylab="p1")
-points(es$sims.list$p1[501:1000],t="l",col="red")
-
-#' Attaches the es object to the R workspace (to use the posteriors for the economic analysis)
-attach.bugs(es)
-
+bmhe::traceplot(es,"p1")
 
 ################################################################################
-#' NB: If you want/need to run `JAGS` and `R2jags`, remember to 
-#' 1. Run `library(R2jags)` to load the relevant package to connect `R` to `JAGS`
-#' 2. Run `jags(...)` instead of `bugs(...)`
-#' 3. `R2jags` stores the MCMC output under the sub-object `$BUGSoutput`, so 
-#'    for instance, you need to run 
-#'    `plot(es$BUGSoutput$sims.list$p1[1:500],t="l",col="blue",ylab="p1")`
-#'    to work on the plot above!
-#'
+#' NB: If you want/need to run `BUGS` and `R2OpenBUGS`, remember to 
+#' 1. Run `library(R2OpenBUGS)` to load the relevant package to connect 
+#'    `R` to `OpenBUGS`
+#' 2. Run `bugs(...)` instead of `jags(...)`
+#' 3. `R2OpenBUGS` stores the MCMC output under the root sub-object 
+#'    so there is no `$BUGSoutput` sub-object. For instance, you need to run 
+#'    `plot(es$sims.list$p1[1:500],t="l",col="blue",ylab="p1")`
+#'    to make a traceplot of the first 500 simulations for p1
+#'    But the functions in `bmhe` will know how to do this automatically!
 ################################################################################
 
 
 #' Runs economic analysis 
-#' cost of treatment
-c <- e <- matrix(NA,n.sims,T)
-c[,1] <- (1-p1)*(c.gp) + p1*(c.gp+c.inf)
-c[,2] <- (1-p2)*(c.gp+c.ni) + p2*(c.gp+c.ni+c.inf)
-e[,1] <- -l*p1
-e[,2] <- -l*p2
+#' Define the variables 'mu.e' and 'mu.c' as empty matrices with 'n.sims' 
+#' rows (one per each MCMC simulation) and 2 columns (one per treatment arm)
+n.sims=es$BUGSoutput$n.sims
+mu.e=mu.c=matrix(NA,n.sims,2)
 
+# Fixed costs
+# Cost of GP visit to issue NIs prescription
+c.gp=19
+# Cost of course of treatment with NIs
+c.ni=2.40*6*7*1.175
+
+# Extracts simulations from the object 'flu' (for simplicity in the code)
+p0=es$BUGSoutput$sims.list$p0
+p1=es$BUGSoutput$sims.list$p1
+c.inf=es$BUGSoutput$sims.list$c.inf
+l=es$BUGSoutput$sims.list$l
+
+# Population average costs
+mu.c[,1]=(1-p0)*c.gp + p0*(c.gp+c.inf)
+mu.c[,2]=(1-p1)*(c.gp+c.ni) + p1*(c.gp+c.ni+c.inf)
+
+# Population average effects
+mu.e[,1]=-l*p0
+mu.e[,2]=-l*p1
+
+# Now uses 'BCEA' to make the economic analysis
 library(BCEA)
-treats <- c("status quo","prophylaxis with NIs")
-m <- bcea(e,c,ref=2,treats,Kmax=10000)
-
+m=bcea(mu.e,mu.c,interventions=c("Status quo","NIs prophylaxis"),ref=2)
+# Economic analysis
+summary(m,wtp=1000)

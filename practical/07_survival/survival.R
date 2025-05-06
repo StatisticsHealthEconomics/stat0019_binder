@@ -68,3 +68,4 @@ psa.plot(psa2,col=c("blue","red"))
 
 psa3=make.surv(m3,mod=2,t=seq(0.01,50),nsim=1000)
 psa.plot(psa3,col=c("blue","red"))
+

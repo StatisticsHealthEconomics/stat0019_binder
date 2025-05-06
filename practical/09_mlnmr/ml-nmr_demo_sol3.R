@@ -1,4 +1,16 @@
-setwd(here::here("08_mlnmr"))
+# Solution to exercise 3
+# Change both calls to transform() (one on plaque_psoriasis_ipd
+# and the other on plaque_psoriasis_agd) so that "UST" is included
+# in the same class as c("IXE_Q2W", "IXE_Q4W", "SEC_150", "SEC_300")
+# and relabel this class to  "IL-17 or IL-12/23 blocker"
+# Run relative_effects() again.
+# Effects of UST vs. IXE_Q2W don't change (both about -0.91) as
+# they are in the same class and the effect is 'common'
+# Effects of UST vs. ETN change (0.45 in CLEAR and 0.47 in ERASURE) as they are still in different classes.
+
+
+setwd(here::here("09_mlnmr"))
+
 
 library(multinma)
 library(dplyr)
@@ -7,11 +19,6 @@ library(dplyr)
 #  Check how many cores current PC has
 options(mc.cores = parallel::detectCores())
 
-
-# Inspect the datasets
-head(plaque_psoriasis_ipd)
-
-head(plaque_psoriasis_agd)
 
 # Form the IPD dataset
 pso_ipd <- transform(plaque_psoriasis_ipd,
@@ -24,9 +31,8 @@ pso_ipd <- transform(plaque_psoriasis_ipd,
                      # Treatment classes
                      trtclass = 
                        ifelse(trtc == "PBO", "Placebo",
-                              ifelse(trtc %in% c("IXE_Q2W", "IXE_Q4W", "SEC_150", "SEC_300"),  "IL-17 blocker",
-                                     ifelse(trtc == "ETN", "TNFa blocker",
-                                            ifelse(trtc == "UST", "IL-12/23 blocker", NA)))),
+                              ifelse(trtc %in% c("IXE_Q2W", "IXE_Q4W", "SEC_150", "SEC_300", "UST"),  "IL-17 or IL-12/23 blocker",
+                                     ifelse(trtc == "ETN", "TNFa blocker", NA))),
                      # Check complete cases for covariates of interest
                      is_complete = complete.cases(durnpso, prevsys, bsa, weight, psa)
 ) 
@@ -45,9 +51,8 @@ pso_agd <- transform(plaque_psoriasis_agd,
                      # Treatment classes
                      trtclass = 
                        ifelse(trtc == "PBO", "Placebo",
-                              ifelse(trtc %in% c("IXE_Q2W", "IXE_Q4W", "SEC_150", "SEC_300"),  "IL-17 blocker",
-                                     ifelse(trtc == "ETN", "TNFa blocker",
-                                            ifelse(trtc == "UST", "IL-12/23 blocker", NA))))
+                              ifelse(trtc %in% c("IXE_Q2W", "IXE_Q4W", "SEC_150", "SEC_300", "UST"),  "IL-17 or IL-12/23 blocker",
+                                     ifelse(trtc == "ETN", "TNFa blocker", NA)))
 )
 
 # Create a combined evidence network
@@ -64,9 +69,6 @@ pso_net <- combine_network(
               n = pasi75_n,
               trt_class = trtclass)
 )
-
-# Plot the evidence network
-plot(pso_net, weight_nodes = TRUE, weight_edges = TRUE, show_trt_class = TRUE)
 
 # Add integration points
 pso_net <- add_integration(pso_net,
@@ -92,41 +94,5 @@ pso_fit_FE <- nma(pso_net,
                   QR = TRUE)
 
 
-
-# Basic parameter summaries
-print(pso_fit_FE, pars = "d")
-
 # Population-average conditional effects
 relative_effects(pso_fit_FE, all_contrasts = TRUE)                 
-
-# Population-average marginal 
-marginal_effects(pso_fit_FE, mtype = "link")  
-
-# Average event probabilities
-predict(pso_fit_FE, type = "response")        
-
-# Relative effects in the PROSPECT study population
-# Specify the characteristics of this population
-prospect_dat <- data.frame(
-  studyc = "PROSPECT",
-  durnpso = 19.6 / 10, durnpso_sd = 13.5 / 10,
-  prevsys = 0.9095,
-  bsa = 18.7 / 100, bsa_sd = 18.4 / 100,
-  weight = 87.5 / 10, weight_sd = 20.3 / 10,
-  psa = 0.202)
-
-# Then estimate relative treatment effects in that population
-relative_effects(pso_fit_FE, newdata = prospect_dat, 
-                 study = studyc, all_contrasts = FALSE)
-
-# Can also generate marginal treatment effects in PROSPECT
-# But need to specify the baseline distribution
-marginal_effects(pso_fit_FE,
-                 mtype = "link",
-                 newdata = prospect_dat,
-                 study = studyc,
-                 baseline = distr(qbeta, 1156, 1509-1156),
-                 baseline_type = "response",
-                 baseline_level = "aggregate",
-                 baseline_trt = "SEC_300",
-                 all_contrasts = TRUE)

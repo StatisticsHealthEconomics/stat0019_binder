@@ -3,7 +3,7 @@ library(R2OpenBUGS)
 library(ggplot2)
 
 ## Set working directory to source the model code
-setwd(here::here("14_evsi_mc"))
+setwd(here::here("12_evsi_mc"))
 # Change if working directory 
 source("model_functions_example.R")
 

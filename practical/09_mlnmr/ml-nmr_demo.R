@@ -1,12 +1,4 @@
-# Solution to Exercise 1
-# Remove weight from regression from nma()
-# Remove weight from add_integration()
-# Replace prospect_dat with tlv_dat taken from the exercise table
-# Run relative_effects on tlv_dat
-# IXE_Q2W remains the treatment with greatest probit difference to placebo.
-
-setwd(here::here("08_mlnmr"))
-
+setwd(here::here("09_mlnmr"))
 
 library(multinma)
 library(dplyr)
@@ -15,6 +7,11 @@ library(dplyr)
 #  Check how many cores current PC has
 options(mc.cores = parallel::detectCores())
 
+
+# Inspect the datasets
+head(plaque_psoriasis_ipd)
+
+head(plaque_psoriasis_agd)
 
 # Form the IPD dataset
 pso_ipd <- transform(plaque_psoriasis_ipd,
@@ -68,11 +65,15 @@ pso_net <- combine_network(
               trt_class = trtclass)
 )
 
+# Plot the evidence network
+plot(pso_net, weight_nodes = TRUE, weight_edges = TRUE, show_trt_class = TRUE)
+
 # Add integration points
 pso_net <- add_integration(pso_net,
                            durnpso = distr(qgamma, mean = durnpso_mean, sd = durnpso_sd),
                            prevsys = distr(qbern, prob = prevsys),
                            bsa = distr(qlogitnorm, mean = bsa_mean, sd = bsa_sd),
+                           weight = distr(qgamma, mean = weight_mean, sd = weight_sd),
                            psa = distr(qbern, prob = psa))
 
 # Run the multinma 
@@ -81,7 +82,7 @@ pso_fit_FE <- nma(pso_net,
                   link = "probit", 
                   likelihood = "bernoulli2",
                   # Specify the regression model applied to IPD and AgD
-                  regression = ~(durnpso + prevsys + bsa + psa)*.trt,
+                  regression = ~(durnpso + prevsys + bsa + weight + psa)*.trt,
                   class_interactions = "common",
                   prior_intercept = normal(scale = 10),
                   prior_trt = normal(scale = 10),
@@ -95,15 +96,37 @@ pso_fit_FE <- nma(pso_net,
 # Basic parameter summaries
 print(pso_fit_FE, pars = "d")
 
+# Population-average conditional effects
+relative_effects(pso_fit_FE, all_contrasts = TRUE)                 
+
+# Population-average marginal 
+marginal_effects(pso_fit_FE, mtype = "link")  
+
+# Average event probabilities
+predict(pso_fit_FE, type = "response")        
+
 # Relative effects in the PROSPECT study population
 # Specify the characteristics of this population
-tlv_dat <- data.frame(
+prospect_dat <- data.frame(
   studyc = "PROSPECT",
-  durnpso = 18.6 / 10, durnpso_sd = 8.5 / 10,
-  prevsys = 0.802,
-  bsa = 17.5 / 100, bsa_sd = 12.4 / 100,
-  psa = 0.181)
+  durnpso = 19.6 / 10, durnpso_sd = 13.5 / 10,
+  prevsys = 0.9095,
+  bsa = 18.7 / 100, bsa_sd = 18.4 / 100,
+  weight = 87.5 / 10, weight_sd = 20.3 / 10,
+  psa = 0.202)
 
 # Then estimate relative treatment effects in that population
-relative_effects(pso_fit_FE, newdata = tlv_dat, 
+relative_effects(pso_fit_FE, newdata = prospect_dat, 
                  study = studyc, all_contrasts = FALSE)
+
+# Can also generate marginal treatment effects in PROSPECT
+# But need to specify the baseline distribution
+marginal_effects(pso_fit_FE,
+                 mtype = "link",
+                 newdata = prospect_dat,
+                 study = studyc,
+                 baseline = distr(qbeta, 1156, 1509-1156),
+                 baseline_type = "response",
+                 baseline_level = "aggregate",
+                 baseline_trt = "SEC_300",
+                 all_contrasts = TRUE)

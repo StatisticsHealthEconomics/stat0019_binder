@@ -1,8 +1,8 @@
 library(voi)
 
 ## Set working directory to source the model code
-setwd(here::here("15_evsi_regression"))
-source(here::here("14_evsi_mc","model_functions_example.R"))
+setwd(here::here("13_evsi_regression"))
+source(here::here("12_evsi_mc","model_functions_example.R"))
 
 ## Run the health economic model for initial PSA
 n_psa_size <- 10000
