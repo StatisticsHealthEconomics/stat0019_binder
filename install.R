@@ -17,4 +17,4 @@ install.packages("survHEinla", repos = c("https://giabaio.r-universe.dev", "http
 install.packages("voi")
 install.packages("multinma")
 install.packages("outstandR", repos = c("https://statisticshealtheconomics.r-universe.dev", "https://cloud.r-project.org"))
-install.packages("simcovariates", repos = c("https://statisticshealtheconomics.r-universe.dev", "https://cloud.r-project.org"))
+install.packages("simcovariates", repos = c("https://n8thangreen.r-universe.dev", "https://cloud.r-project.org"))
