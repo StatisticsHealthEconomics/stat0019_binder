@@ -1,8 +1,7 @@
 FROM rocker/binder:latest
 
 ## Declare build arguments with defaults for your custom user
-ARG NB_USER=bmhe
-ARG NB_UID=1000
+ARG NB_USER=joyvan
 ##### ARG git_personal_token
 
 USER root
