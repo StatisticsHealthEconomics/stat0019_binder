@@ -15,6 +15,12 @@ setwd(here::here("10_mim/"))
 #'     "https://statisticshealtheconomics.r-universe.dev", 
 #'     "https://cloud.r-project.org")
 #' )
+#' install.packages(
+#'   "simcovariates", 
+#'   repos = c(
+#'     "https://statisticshealtheconomics.r-universe.dev", 
+#'     "https://cloud.r-project.org")
+#' )
 #' NB: In the docker VM, these are already installed so you can just proceed
 
 #' Loads relevant packages
