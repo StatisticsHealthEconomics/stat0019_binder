@@ -28,6 +28,8 @@ RUN echo "Checking for 'apt.txt'..." && \
 
 # Run R install script if it exists
 RUN if [ -f install.R ]; then R --quiet -f install.R; fi
+# Needed to allow INLA to run (set permissions)
+RUN chmod +x /usr/local/lib/R/site-library/INLA/bin/linux/64bit/inla.mkl.run
 
 # Switch to bmhe user
 USER ${NB_USER}
