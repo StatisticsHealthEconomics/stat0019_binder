@@ -13,7 +13,3 @@ libeigen3-dev
 gcc-multilib 
 g++-multilib
 jags
-build-essential 
-libcurl4-
-libssl-dev 
-libxml2-dev 
