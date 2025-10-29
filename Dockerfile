@@ -15,6 +15,9 @@ COPY --chown=${NB_USER}:${NB_USER} . /home/${NB_USER}
 
 ENV DEBIAN_FRONTEND=noninteractive
 
+# limits compilation thread to avoid memory shortage
+ENV MAKEFLAGS="-j1"
+
 # Install apt packages if apt.txt exists
 RUN echo "Checking for 'apt.txt'..." && \
     if [ -f "apt.txt" ]; then \
