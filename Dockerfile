@@ -15,9 +15,6 @@ COPY --chown=${NB_USER}:${NB_USER} . /home/${NB_USER}
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# limits compilation thread to avoid memory shortage
-ENV MAKEFLAGS="-j1"
-
 # Install apt packages if apt.txt exists
 RUN echo "Checking for 'apt.txt'..." && \
     if [ -f "apt.txt" ]; then \
@@ -34,6 +31,8 @@ RUN if [ -f install.R ]; then R --quiet -f install.R; fi
 # Needed to allow INLA to run (set permissions)
 RUN chmod +x /usr/local/lib/R/site-library/INLA/bin/linux/64bit/inla.mkl \
     && chmod +x /usr/local/lib/R/site-library/INLA/bin/linux/64bit/inla.mkl.run
+# Cleans up
+rm BCEA_2.4.82.tar.gz multinma_0.8.1.tar.gz
 
 # Switch to bmhe user
 USER ${NB_USER}
