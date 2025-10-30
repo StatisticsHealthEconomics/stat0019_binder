@@ -1,5 +1,5 @@
 options(timeout=600)
-install.packages("BCEA", repos = c("https://giabaio.r-universe.dev", "https://cloud.r-project.org"))
+install.packages("BCEA", repos = c("https://giabaio.r-universe.dev", "https://cloud.r-project.org"),type="source")
 install.packages("bmhe", repos = c("https://giabaio.r-universe.dev", "https://cloud.r-project.org"))
 install.packages("tidyverse")
 install.packages("here")
