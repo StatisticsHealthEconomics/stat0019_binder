@@ -32,7 +32,7 @@ RUN if [ -f install.R ]; then R --quiet -f install.R; fi
 RUN chmod +x /usr/local/lib/R/site-library/INLA/bin/linux/64bit/inla.mkl \
     && chmod +x /usr/local/lib/R/site-library/INLA/bin/linux/64bit/inla.mkl.run
 # Cleans up
-rm BCEA_2.4.82.tar.gz multinma_0.8.1.tar.gz
+RUN rm BCEA_2.4.82.tar.gz multinma_0.8.1.tar.gz
 
 # Switch to bmhe user
 USER ${NB_USER}
