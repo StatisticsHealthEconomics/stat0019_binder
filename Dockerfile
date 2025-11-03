@@ -1,19 +1,22 @@
 FROM rocker/binder:latest
 
 ## Declare build arguments with defaults for your custom user
-ARG NB_USER=joyvan
-##### ARG git_personal_token
+ARG NB_USER=jovyan
 
+# Switch to root to do the main installation
 USER root
 
-# Create user bmhe if not exists
-RUN id -u ${NB_USER} 2>/dev/null || \
-    useradd -m -s /bin/bash ${NB_USER}
+# Create user jovyan if not exists
+#RUN id -u ${NB_USER} 2>/dev/null || true
+#RUN useradd -m -s /bin/bash ${NB_USER}
 
-# Copy your project files to /home/bmhe with ownership
+# Copy your project files to /home/joyvan with ownership
 COPY --chown=${NB_USER}:${NB_USER} . /home/${NB_USER}
 
 ENV DEBIAN_FRONTEND=noninteractive
+
+# Move to the /home/${NB_USER} folder where all the local files have been copied
+WORKDIR /home/${NB_USER}
 
 # Install apt packages if apt.txt exists
 RUN echo "Checking for 'apt.txt'..." && \
@@ -31,10 +34,10 @@ RUN if [ -f install.R ]; then R --quiet -f install.R; fi
 # Needed to allow INLA to run (set permissions)
 RUN chmod +x /usr/local/lib/R/site-library/INLA/bin/linux/64bit/inla.mkl \
     && chmod +x /usr/local/lib/R/site-library/INLA/bin/linux/64bit/inla.mkl.run
-# Cleans up
-RUN rm BCEA_2.4.82.tar.gz multinma_0.8.1.tar.gz
+# Installs BMHE from the deb and cleans up
+RUN dpkg -i bmhe_0.1.0-1.0_all.deb && rm bmhe_0.1.0-1.0_all.deb
 
-# Switch to bmhe user
+# Switch to jovyan user
 USER ${NB_USER}
 
 # Copy RStudio prefs to bmhe's config folder
