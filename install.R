@@ -17,7 +17,7 @@ install.packages("multinma")
 remotes::install_github("giabaio/survHEinla")
 remotes::install_github("StatisticsHealthEconomics/outstandR")
 remotes::install_github("n8thangreen/simcovariates")
-install.packages("stan")
+install.packages("rstan")
 ## For some reason, packages that are *only* on r-universe.dev break the mybinder
 ## installation... They work OK if installed through remotes. And in fact, other
 ## repos don't seem to interact badly with bspm (which looks for packages on r2u
