@@ -13,3 +13,4 @@ install.packages("INLA",repos=c("https://cloud.r-project.org",INLA="https://inla
 # Needs the R-forge version of MatrixModels or else INLA will break
 install.packages("MatrixModels",repos="https://r-forge.r-project.org/")
 install.packages("survHEinla", repos = c("https://giabaio.r-universe.dev", "https://cloud.r-project.org"))
+install.packages("rstan")
