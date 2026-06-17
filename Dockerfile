@@ -35,7 +35,7 @@ RUN if [ -f install.R ]; then R --quiet -f install.R; fi
 RUN chmod +x /usr/local/lib/R/site-library/INLA/bin/linux/64bit/inla.mkl \
     && chmod +x /usr/local/lib/R/site-library/INLA/bin/linux/64bit/inla.mkl.run
 # Installs BMHE from the deb and cleans up
-RUN dpkg -i bmhe_0.1.0-1.0_all.deb && rm bmhe_0.1.0-1.0_all.deb
+#RUN dpkg -i bmhe_0.1.0-1.0_all.deb && rm bmhe_0.1.0-1.0_all.deb
 
 # Switch to jovyan user
 USER ${NB_USER}
