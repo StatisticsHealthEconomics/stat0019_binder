@@ -185,7 +185,7 @@ ylabs=c(
 
 #' Generate the data for the 'direct' comparison using the 
 #' make_data_no_pooling' function defined above
-out1=make_data_no_pooling()
+out1=make_data_no_pooling() |> rename(low=`2.5%`,upp=`97.5%`)
 #'
 #' You should check the output 'out1' to see what it looks like... 
 out1
@@ -196,17 +196,16 @@ out1
 toplot |> mutate(model="Fixed effect (indirect)",Parameter=ylabs) |> 
   bind_rows(out1 |> mutate(model="No pooling effect (direct)",Parameter=ylabs)) |> 
   ggplot(aes(mean,Parameter)) + 
-  geom_point(aes(col=model),position=position_dodge2(width=c(.25))) +
+  geom_point(aes(col=model,shape=model),position=position_dodge2(width=c(.25))) +
   geom_linerange(
-    aes(xmin =`2.5%`, xmax =`97.5%`,col=model),
+    aes(xmin =low, xmax =upp,col=model),
     position=position_dodge2(width=c(.25))
   ) + geom_vline(xintercept=1, col="gray50") + 
-  labs(x="Odds Ratio") +  
+  labs(x="Odds Ratio",shape="") +  
   theme(
-    legend.position="inside",legend.position.inside=c(.75,.1),
-    legend.background=element_blank()
+    legend.position=c(.75,.1),legend.background=element_blank()
   ) + labs(col="") + ylab("") + xlim(0,6) +
-  scale_color_manual(values=c("black","red"))
+  scale_color_manual(values = c("#FF7F0E","#000000"))
 
 
 #' Now defines the model code for no-pooling individual studies
@@ -229,7 +228,8 @@ heterogeneity=function() {
 
 #' Generate the data for the 'heterogeneity' comparison using the 
 #' make_data_no_pooling' function defined above
-out2=make_data_no_pooling(type="heterogeneity") 
+out2=make_data_no_pooling(type="heterogeneity") |> 
+  rename(low=`2.5%`,upp=`97.5%`)
 #'
 #' Check this out...
 out2
@@ -241,14 +241,14 @@ out2 |> mutate(Parameter=as.factor(paste0("s=",s," N=",N))) |>
   # mutate(ttt=paste0(id,": N=",N)) |> mutate(Parameter=as.factor(ttt)) |>
   ggplot(aes(mean,fct_reorder(Parameter,s,.desc=TRUE))) +
   geom_linerange(
-    aes(xmin =`2.5%`, xmax =`97.5%`)
+    aes(xmin =low, xmax =upp)
   ) + geom_vline(xintercept=1, linetype = "dashed") + 
   geom_point() +
   labs(x="Odds Ratio (log scale axis)") + 
   facet_grid(comparison~.,scales="free",space="free") +
   ylab("") +
   theme(strip.text.y = element_text(angle = 0)) +
- scale_x_continuous(
+  scale_x_continuous(
     trans='log',labels=c(.2,.5,1,2,5,10,25),
     breaks=c(.2,.5,1,2,5,10,25)
   ) 
@@ -324,16 +324,16 @@ toplot_fe |> mutate(model="Fixed effect (indirect)",Parameter=ylabs) |>
   bind_rows(out1 |> mutate(model="No pooling (direct)",Parameter=ylabs)) |> 
   bind_rows(toplot_re |> mutate(model="Random effects",Parameter=ylabs)) |>
   ggplot(aes(mean,Parameter)) + 
-  geom_point(aes(col=model),position=position_dodge2(width=c(.35))) +
+  geom_point(aes(col=model,shape=model),position=position_dodge2(width=c(.35))) +
   geom_linerange(
-    aes(xmin =`2.5%`, xmax =`97.5%`,col=model),
+    aes(xmin =low, xmax =upp,col=model),
     position=position_dodge2(width=c(.35))
   ) + geom_vline(xintercept=1, col="gray50") + 
-  labs(x="Odds Ratio") +  
+  labs(x="Odds Ratio",shape="") +  
   theme(
     legend.position=c(.75,.12),legend.background=element_blank()
   ) + labs(col="") + ylab("") + xlim(0,6) +
-  scale_color_manual(values=c("black","red","blue"))
+  scale_color_manual(values = c("#FF7F0E","#000000","#1F77B4"))
 
 
 #' Now compares the estimates in terms of the absolute probability of 
@@ -357,20 +357,20 @@ toplot=toplot_fe |> mutate(model="Fixed effects") |>
 toplot |> ggplot(aes(mean,Parameter)) + 
   geom_point(aes(col=model),position=position_dodge2(width=c(.25))) +
   geom_linerange(
-    aes(xmin =`2.5%`, xmax =`97.5%`,col=model),
+    aes(xmin =low, xmax =upp,col=model),
     position=position_dodge2(width=c(.25))
   ) + labs(x="Probablity of quitting smoking") +  
   theme(
     legend.position=c(.75,.15),legend.background=element_blank()
   ) + labs(col="") + ylab("") +
   annotate(
-    "text",toplot|> dplyr::filter(model=="Fixed effects") |> pull(`2.5%`),y=1:4,
-    label=round(toplot|> dplyr::filter(model=="Fixed effects") |> pull(`2.5%`),3),
+    "text",toplot|> dplyr::filter(model=="Fixed effects") |> pull(low),y=1:4,
+    label=round(toplot|> dplyr::filter(model=="Fixed effects") |> pull(low),3),
     vjust=2.25
   ) +
   annotate(
-    "text",toplot|> dplyr::filter(model=="Fixed effects") |> pull(`97.5%`),y=1:4,
-    label=round(toplot|> dplyr::filter(model=="Fixed effects") |> pull(`97.5%`),3),
+    "text",toplot|> dplyr::filter(model=="Fixed effects") |> pull(upp),y=1:4,
+    label=round(toplot|> dplyr::filter(model=="Fixed effects") |> pull(upp),3),
     vjust=2.25
   ) +
   annotate(
@@ -379,13 +379,13 @@ toplot |> ggplot(aes(mean,Parameter)) +
     vjust=2.25
   ) +
   annotate(
-    "text",toplot|> dplyr::filter(model=="Random effects") |> pull(`2.5%`),y=1:4,
-    label=round(toplot|> dplyr::filter(model=="Random effects") |> pull(`2.5%`),3),
+    "text",toplot|> dplyr::filter(model=="Random effects") |> pull(low),y=1:4,
+    label=round(toplot|> dplyr::filter(model=="Random effects") |> pull(low),3),
     vjust=-1.15
   ) +
   annotate(
-    "text",toplot|> dplyr::filter(model=="Random effects") |> pull(`97.5%`),y=1:4,
-    label=round(toplot|> dplyr::filter(model=="Random effects") |> pull(`97.5%`),3),
+    "text",toplot|> dplyr::filter(model=="Random effects") |> pull(upp),y=1:4,
+    label=round(toplot|> dplyr::filter(model=="Random effects") |> pull(upp),3),
     vjust=-1.15
   ) +
   annotate(
