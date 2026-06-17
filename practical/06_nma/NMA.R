@@ -1,6 +1,7 @@
 #' Smoking cessation network meta-analysis data in format obtained
 #' from Lu & Ades tutorial "Introduction to Mixed Treatment Comparisons"
 library(tidyverse)
+library(forcats)
 smoking_data=readRDS(here::here("06_nma/smoke.rds"))
 
 #' Loads R2jags and creates the fixed effect model as an R function
